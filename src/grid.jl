@@ -70,7 +70,7 @@ function RegionGrid(
 
     for ii in eachindex(lon)
         ipnt = Point2(lon[ii],lat[ii])
-        if isinGeoRegion(ipnt,geo,throw=false)
+        if in(ipnt,geo)
               mask[ii] = 1
         else; mask[ii] = NaN
         end
@@ -100,7 +100,7 @@ function VectorGrid(
 
     for ii in eachindex(lon)
         ipnt = Point2(lon[ii],lat[ii])
-        if isinGeoRegion(ipnt,geo,throw=false)
+        if in(ipnt,geo)
               mask[ii] = 1
         else; mask[ii] = NaN
         end
@@ -156,8 +156,7 @@ end
 function TiltGrid(
     geo :: TiltRegion,
     lon :: Vector{<:Real},
-    lat :: Vector{<:Real};
-    FT = Float64
+    lat :: Vector{<:Real}
 )
 
     @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
@@ -229,8 +228,7 @@ end
 function PolyGrid(
     geo :: PolyRegion,
     lon :: Vector{<:Real},
-    lat :: Vector{<:Real};
-    FT = Float64
+    lat :: Vector{<:Real}
 )
 
     @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
@@ -270,7 +268,7 @@ function PolyGrid(
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
     for ilat in eachindex(nlat), ilon in eachindex(nlon)
         ipnt = Point2(nlon[ilon],nlat[ilat])
-        if isinGeoRegion(ipnt,geo,throw=false)
+        if in(ipnt,geo)
               mask[ilon,ilat] = 1
         else; mask[ilon,ilat] = NaN
         end
