@@ -1,23 +1,44 @@
-using RegionGrids
 using Documenter
+using DocumenterVitepress
+using RegionGrids
+# using CairoMakie
+# using Literate
+
+# CairoMakie.activate!(type = "svg")
 
 DocMeta.setdocmeta!(RegionGrids, :DocTestSetup, :(using RegionGrids); recursive=true)
 
 makedocs(;
-    modules=[RegionGrids],
-    authors="Nathanael Wong <natgeo.wong@outlook.com>",
-    sitename="RegionGrids.jl",
-    format=Documenter.HTML(;
-        canonical="https://natgeo-wong.github.io/RegionGrids.jl",
-        edit_link="main",
-        assets=String[],
+    modules  = [RegionGrids],
+    authors  = "Nathanael Wong <natgeo.wong@outlook.com>",
+    sitename = "RegionGrids.jl",
+    doctest  = false,
+    warnonly = true,
+    format   = DocumenterVitepress.MarkdownVitepress(
+        repo = "https://github.com/GeoRegionsEcosystem/RegionGrids.jl",
     ),
     pages=[
         "Home" => "index.md",
     ],
 )
 
+recursive_find(directory, pattern) =
+    mapreduce(vcat, walkdir(directory)) do (root, dirs, files)
+        joinpath.(root, filter(contains(pattern), files))
+    end
+
+files = []
+for pattern in [r"\.cst", r"\.nc"]
+    global files = vcat(files, recursive_find(@__DIR__, pattern))
+end
+
+for file in files
+    rm(file)
+end
+
 deploydocs(;
-    repo="github.com/natgeo-wong/RegionGrids.jl",
-    devbranch="main",
+    repo      = "github.com/GeoRegionsEcosystem/RegionGrids.jl.git",
+    target    = "build", # this is where Vitepress stores its output
+    devbranch = "main",
+    branch    = "gh-pages",
 )
