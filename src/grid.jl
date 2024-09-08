@@ -355,30 +355,3 @@ function regiongrid(gridbounds::Vector{<:Real},rlon::Vector{<:Real},rlat::Vector
     return [iN,iS,iE,iW]
 
 end
-
-function regioninfo(gridbounds::Vector{<:Real},rlon::Vector{<:Real},rlat::Vector{<:Real})
-
-    iN,iS,iE,iW = regiongrid(gridbounds,rlon,rlat);
-    nlon = deepcopy(rlon)
-
-    if     iN < iS; iNS = vcat(iN:iS)
-    elseif iS < iN; iNS = vcat(iS:iN)
-    else;           iNS = [iN];
-    end
-
-    if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && bounds[3] != bounds[4])
-          iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
-    else; iWE = [iW];
-    end
-
-    while maximum(nlon); nlon .-= 360 end
-    nlon = nlon[iWE]
-    nlat =  lat[iNS]
-
-    while maximum(nlon) > geo.E; nlon .-= 360 end
-    while minimum(nlon) < geo.W; nlon .+= 360 end
-
-    return RectGrid{FT}(igrid,iWE,iNS,nlon,nlat)
-
-end
