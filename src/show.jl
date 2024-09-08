@@ -59,3 +59,13 @@ function show(io::IO, grd::RegionMask)
 		"    Valid Mask Proportion   : $(sum(isone.(grd.mask))) / $(nlon*nlat)\n",
 	)
 end
+
+function show(io::IO, grd::VectorMask)
+	nlon = size(grd.lon)
+    print(
+		io,
+		"The RegionMask Grid type has the following properties:\n",
+		"    Vector Size    (npnt) : $(nlon) points\n",
+		"    Valid Mask Proportion : $(sum(isone.(grd.mask))) / $(nlon)\n",
+	)
+end
