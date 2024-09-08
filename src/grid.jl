@@ -67,16 +67,19 @@ function RegionGrid(
     end
 
     mask = zeros(size(lon))
+    wgts = zeros(size(lon))
 
     for ii in eachindex(lon)
         ipnt = Point2(lon[ii],lat[ii])
         if in(ipnt,geo)
               mask[ii] = 1
+              wgts[ii] = cosd.(lat[ii])
         else; mask[ii] = NaN
+              wgts[ii] = 0
         end
     end
 
-    return RegionMask{FT}(lon,lat,mask)
+    return RegionMask{FT}(lon,lat,mask,wgts)
 
 end
 
@@ -145,11 +148,17 @@ function RectGrid(
     while maximum(nlon) > 360; nlon .-= 360 end
     nlon = nlon[iWE]
     nlat =  lat[iNS]
+    mask = ones(length(nlon),length(nlat))
+    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
+    
+    for ilat in eachindex(nlat)
+        wgts[:,ilat] .= cosd(nlat[ilat])
+    end
 
     while maximum(nlon) > geo.E; nlon .-= 360 end
     while minimum(nlon) < geo.W; nlon .+= 360 end
 
-    return RectGrid{eltype(lon)}(igrid,nlon,nlat,iWE,iNS)
+    return RectGrid{eltype(lon)}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
 
 end
 
@@ -192,6 +201,7 @@ function TiltGrid(
     nlon = nlon[iWE]
     nlat =  lat[iNS]
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
+    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
     rotX = Array{FT,2}(undef,length(nlon),length(nlat))
     rotY = Array{FT,2}(undef,length(nlon),length(nlat))
 
@@ -211,17 +221,19 @@ function TiltGrid(
             iθ = atand(mlat[ilat]-Y, mlon[ilon]-X) - geo.θ
             rotX[ilon,ilat] = ir * cosd(iθ)
             rotY[ilon,ilat] = ir * sind(iθ)
+            wgts[ilon,ilat] = cosd.(nlat[ilat])
         else
             mask[ilon,ilat] = NaN
             rotX[ilon,ilat] = NaN
             rotY[ilon,ilat] = NaN
+            wgts[ilon,ilat] = 0
         end
     end
 
     while maximum(nlon) > geo.E; nlon .-= 360 end
     while minimum(nlon) < geo.W; nlon .+= 360 end
 
-    return TiltGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,rotX,rotY)
+    return TiltGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
 
 end
 
@@ -266,18 +278,21 @@ function PolyGrid(
     nlon = nlon[iWE]
     nlat =  lat[iNS]
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
+    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
     for ilat in eachindex(nlat), ilon in eachindex(nlon)
         ipnt = Point2(nlon[ilon],nlat[ilat])
         if in(ipnt,geo)
               mask[ilon,ilat] = 1
+              wgts[ilon,ilat] = cosd.(nlat[ilat])
         else; mask[ilon,ilat] = NaN
+              wgts[ilon,ilat] = 0
         end
     end
 
     while maximum(nlon) > geo.E; nlon .-= 360 end
     while minimum(nlon) < geo.W; nlon .+= 360 end
 
-    return PolyGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask)
+    return PolyGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
 
 end
 
