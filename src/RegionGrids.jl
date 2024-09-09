@@ -15,7 +15,9 @@ using Reexport
 
 ## Exporting the following functions:
 export
-        RegionGrid, RectGrid, PolyGrid, VectorGrid, RegionMask, VectorMask,
+        RegionGrid,
+        RectilinearGrid, RectGrid, PolyGrid, TiltGrid,
+        GeneralizedGrid, RegionMask, VectorMask, VectorGrid,
 
         extract, extract!
 
@@ -50,7 +52,9 @@ A `RegionMask` type will contain the following fields:
 """
 abstract type RegionGrid end
 
-struct RectGrid{FT<:Real} <: RegionGrid
+abstract type RectilinearGrid <: RegionGrid end
+abstract type GeneralizedGrid <: RegionGrid end
+struct RectGrid{FT<:Real} <: RectilinearGrid
     grid :: Vector{Int}
      lon :: Vector{FT}
      lat :: Vector{FT}
@@ -60,7 +64,7 @@ struct RectGrid{FT<:Real} <: RegionGrid
     weights :: Array{FT,2}
 end
 
-struct PolyGrid{FT<:Real} <: RegionGrid
+struct PolyGrid{FT<:Real} <: RectilinearGrid
     grid :: Vector{Int}
      lon :: Vector{FT}
      lat :: Vector{FT}
@@ -70,7 +74,7 @@ struct PolyGrid{FT<:Real} <: RegionGrid
     weights :: Array{FT,2}
 end
 
-struct TiltGrid{FT<:Real} <: RegionGrid
+struct TiltGrid{FT<:Real} <: RectilinearGrid
     grid :: Vector{Int}
      lon :: Vector{FT}
      lat :: Vector{FT}
@@ -82,14 +86,14 @@ struct TiltGrid{FT<:Real} <: RegionGrid
     rotY :: Array{FT,2}
 end
 
-struct RegionMask{FT<:Real} <: RegionGrid
+struct RegionMask{FT<:Real} <: GeneralizedGrid
      lon :: Array{FT,2}
      lat :: Array{FT,2}
     mask :: Array{FT,2}
     weights :: Array{FT,2}
 end
 
-struct VectorMask{FT<:Real} <: RegionGrid
+struct VectorMask{FT<:Real} <: GeneralizedGrid
      lon :: Vector{FT}
      lat :: Vector{FT}
     mask :: Vector{FT}
