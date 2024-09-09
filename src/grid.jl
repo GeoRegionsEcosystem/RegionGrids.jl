@@ -128,6 +128,10 @@ function RectGrid(
     E = geo.E
     W = geo.W
 
+    if eltype(lon) <: AbstractFloat
+        FT = eltype(lon)
+    end
+
     igrid = regiongrid([N,S,E,W],lon,lat);
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
     nlon = deepcopy(lon)
@@ -148,7 +152,7 @@ function RectGrid(
     while maximum(nlon) > 360; nlon .-= 360 end
     nlon = nlon[iWE]
     nlat =  lat[iNS]
-    mask = ones(length(nlon),length(nlat))
+    mask = ones(FT,length(nlon),length(nlat))
     wgts = Array{FT,2}(undef,length(nlon),length(nlat))
     
     for ilat in eachindex(nlat)
@@ -158,7 +162,7 @@ function RectGrid(
     while maximum(nlon) > geo.E; nlon .-= 360 end
     while minimum(nlon) < geo.W; nlon .+= 360 end
 
-    return RectGrid{eltype(lon)}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
+    return RectGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
 
 end
 

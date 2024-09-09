@@ -8,6 +8,7 @@ using Logging
 using PolygonOps
 
 import Base: show
+import GeoRegions: isgridinregion
 
 using Reexport
 @reexport using GeoRegions
