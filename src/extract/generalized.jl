@@ -7,7 +7,7 @@
 Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that contains data of a Parent `GeoRegion`, into another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
 
 !!! warning
-    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before proceeding. The order of the 3rd and 4th dimensions (when used), however, is not significant.
+    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before setting `crop = true`. The order of the 3rd and 4th dimensions (when used), however, is not significant.
 
 Arguments
 =========
@@ -16,14 +16,25 @@ Arguments
 """
 function extract(
     odata :: AbstractArray{<:Real},
-    ggrd  :: GeneralizedGrid
+    ggrd  :: GeneralizedGrid;
+    crop  :: Bool = false
 )
 
-    mask  = ggrd.mask
-	ndata = zeros(size(mask))
-	for ii in eachindex(mask)
-		ndata[ii] = odata[ii] * mask[ii]
-	end
+    mask = ggrd.mask; nlon,nlat = size(mask)
+    dims = size(odata); ndims = length(dims)
+
+    if ndims > 2
+        ndata = zeros(nlon,nlat,dims[3:end]...)
+        edims = map(x -> 1 : x, dims[3:end])
+        for ilon in 1 : nlat, ilat in 1 : nlon
+            ndata[ilon,ilat,edims...] = odata[ilon,ilat,edims...] * mask[glon,glat]
+        end
+    else
+        ndata = zeros(nlon,nlat)
+        for ilon in 1 : nlat, ilat in 1 : nlon
+            ndata[ilon,ilat] = odata[ilon,ilat] * mask[glon,glat]
+        end
+    end
 
     return ndata
 
@@ -40,8 +51,8 @@ Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that conta
 
 This allows for iterable in-place modification to save memory space and reduce allocations if the dimensions are fixed.
 
-!!! warning
-    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before proceeding. The order of the 3rd and 4th dimensions (when used), however, is not significant.
+!!! warning "Cropping"
+    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before setting `crop = true`. The order of the 3rd and 4th dimensions (when used), however, is not significant.
 
 Arguments
 =========
@@ -52,12 +63,23 @@ Arguments
 function extract!(
     ndata :: AbstractArray{<:Real},
     odata :: AbstractArray{<:Real},
-    ggrd  :: GeneralizedGrid
+    ggrd  :: GeneralizedGrid;
+    crop  :: Bool = false
 )
 
-    mask  = ggrd.mask
-    for ii in eachindex(mask)
-        ndata[ii] = odata[ii] * mask[ii]
+    mask = ggrd.mask; nlon,nlat = size(mask)
+    dims = size(odata); ndims = length(dims)
+
+    if ndims > 2
+        edims = map(x -> 1 : x, dims[3:end])
+        for ilon in 1 : nlat, ilat in 1 : nlon
+            ndata[ilon,ilat,edims...] = odata[ilon,ilat,edims...] * mask[glon,glat]
+        end
+    else
+        ndata = zeros(nlon,nlat)
+        for ilon in 1 : nlat, ilat in 1 : nlon
+            ndata[ilon,ilat] = odata[ilon,ilat] * mask[glon,glat]
+        end
     end
 
     return
