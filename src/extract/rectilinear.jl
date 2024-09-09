@@ -16,7 +16,7 @@ Arguments
 """
 function extract(
     odata :: AbstractArray{<:Real,2},
-    ggrd  :: RegionGrid
+    ggrd  :: RectilinearGrid
 )
 
     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
@@ -54,7 +54,7 @@ Arguments
 function extract!(
     ndata :: AbstractArray{<:Real,2},
     odata :: AbstractArray{<:Real,2},
-    ggrd  :: RegionGrid
+    ggrd  :: RectilinearGrid
 )
 
     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
@@ -89,7 +89,7 @@ end
 function extract!(
     ndata :: AbstractArray{<:Real,3},
     odata :: AbstractArray{<:Real,3},
-    ggrd  :: RegionGrid
+    ggrd  :: RectilinearGrid
 )
 
     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
@@ -126,7 +126,7 @@ end
 function extract!(
     ndata :: AbstractArray{<:Real,4},
     odata :: AbstractArray{<:Real,4},
-    ggrd  :: RegionGrid
+    ggrd  :: RectilinearGrid
 )
 
     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
