@@ -1,22 +1,27 @@
 """
     extract(
         odata :: AbstractArray{<:Real},
-        ggrd  :: RegionGrid
+        ggrd  :: RegionMask;
+        crop  :: Bool = false
     ) -> Array{<:Real}
 
-Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that contains data of a Parent `GeoRegion`, into another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
+Extracts data from odata, an Array of dimension N (where N > 2) that contains data of a Parent `GeoRegion`, into another Array of dimension N.
 
-!!! warning
-    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before setting `crop = true`. The order of the 3rd and 4th dimensions (when used), however, is not significant.
+!!! warning "Dimension Order"
+    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude.
 
 Arguments
 =========
 - `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from
 - `ggrd` : A `RegionGrid` containing detailed information on what to extract
+
+Keyword Arguments
+=================
+- `crop` : If `true`, crop new array to fit extracted data to save size
 """
 function extract(
     odata :: AbstractArray{<:Real},
-    ggrd  :: GeneralizedGrid;
+    ggrd  :: RegionMask;
     crop  :: Bool = false
 )
 
@@ -36,6 +41,17 @@ function extract(
         end
     end
 
+    if crop
+        iNaN = .!isnan.(mask); ilon = sum(iNaN,dims=2); ilat = sum(iNaN,dims=1)
+        blon = findfirst(.!iszero(ilon)); elon = findlast(.!iszero(ilon))
+        blat = findfirst(.!iszero(ilat)); elat = findlast(.!iszero(ilat))
+        if not2D
+            ndata = ndata[blon:elon,blat:elat,edims...]
+        else
+            ndata = ndata[blon:elon,blat:elat]
+        end
+    end
+
     return ndata
 
 end
@@ -44,15 +60,15 @@ end
     extract!(
         odata :: AbstractArray{<:Real},
         ndata :: AbstractArray{<:Real},
-        ggrd  :: RegionGrid
+        ggrd  :: RegionMask
     ) -> nothing
 
-Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that contains data of a Parent `GeoRegion`, into ndata, another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
+Extracts data from odata, an Array of dimension N (where N > 2) that contains data of a Parent `GeoRegion`, into ndata, another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
 
 This allows for iterable in-place modification to save memory space and reduce allocations if the dimensions are fixed.
 
-!!! warning "Cropping"
-    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before setting `crop = true`. The order of the 3rd and 4th dimensions (when used), however, is not significant.
+!!! warning "Dimension Order"
+    Please ensure that the 1st dimension is longitude and 2nd dimension is latitude
 
 Arguments
 =========
@@ -63,8 +79,7 @@ Arguments
 function extract!(
     ndata :: AbstractArray{<:Real},
     odata :: AbstractArray{<:Real},
-    ggrd  :: GeneralizedGrid;
-    crop  :: Bool = false
+    ggrd  :: RegionMask
 )
 
     mask = ggrd.mask; nlon,nlat = size(mask)
