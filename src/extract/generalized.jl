@@ -5,19 +5,19 @@
         crop  :: Bool = false
     ) -> Array{<:Real}
 
-Extracts data from odata, an Array of dimension N (where N > 2) that contains data of a Parent `GeoRegion`, into another Array of dimension N.
+Using a `RegionMask` for a region of interest, retrieve valid data - all other data outside the region of interest 
 
 !!! warning "Dimension Order"
     Please ensure that the 1st dimension is longitude and 2nd dimension is latitude.
 
 Arguments
 =========
-- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from
-- `ggrd` : A `RegionGrid` containing detailed information on what to extract
+- `odata` : An array of containing the original gridded data.
+- `ggrd` : A `RegionMask` type containing detailed information on the ranges of valid longitude/latitude data to be extracted.
 
 Keyword Arguments
 =================
-- `crop` : If `true`, crop new array to fit extracted data to save size
+- `crop` : If `true`, crop new array to valid data to save size.
 """
 function extract(
     odata :: AbstractArray{<:Real},

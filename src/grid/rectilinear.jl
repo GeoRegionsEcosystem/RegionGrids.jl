@@ -3,16 +3,19 @@
         geo :: GeoRegion,
         lon :: Union{Vector{<:Real},AbstractRange{<:Real},
         lat :: Union{Vector{<:Real},AbstractRange{<:Real}
-    ) -> RectGrid, PolyGrid
+    ) -> ggrd :: RectilinearGrid
 
 Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
 
 Arguments
 =========
-
 - `geo` : A GeoRegion of interest
 - `lon` : A vector or `AbstractRange` containing the longitude points
 - `lat` : A vector or `AbstractRange` containing the latitude points
+
+Returns
+=======
+- `ggrd` : A `RectilinearGrid`
 """
 RegionGrid(
     geo::RectRegion, lon::Vector{<:Real}, lat::Vector{<:Real}
@@ -36,23 +39,15 @@ RegionGrid(
 
 function RectGrid(
     geo :: RectRegion,
-    lon :: Vector{<:Real},
-    lat :: Vector{<:Real}
-)
+    lon :: Vector{FT},
+    lat :: Vector{FT}
+) where FT <: Real
 
     @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
-    N = geo.N
-    S = geo.S
-    E = geo.E
-    W = geo.W
 
-    if eltype(lon) <: AbstractFloat
-        FT = eltype(lon)
-    end
-
-    igrid = regiongrid([N,S,E,W],lon,lat);
+    igrid = regiongrid([N(geo),S(geo),E(geo),W(geo)],lon,lat);
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
     nlon = deepcopy(lon)
 
@@ -64,7 +59,7 @@ function RectGrid(
 
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E != W)
+    elseif iW > iE || (iW == iE && E(geo) != W(geo))
           iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
@@ -79,8 +74,8 @@ function RectGrid(
         wgts[:,ilat] .= cosd(nlat[ilat])
     end
 
-    while maximum(nlon) > geo.E; nlon .-= 360 end
-    while minimum(nlon) < geo.W; nlon .+= 360 end
+    while maximum(nlon) > E(geo); nlon .-= 360 end
+    while minimum(nlon) < W(geo); nlon .+= 360 end
 
     return RectGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
 
@@ -88,21 +83,15 @@ end
 
 function TiltGrid(
     geo :: TiltRegion,
-    lon :: Vector{<:Real},
-    lat :: Vector{<:Real}
-)
+    lon :: Vector{FT},
+    lat :: Vector{FT}
+) where FT <: Real
 
     @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
-    N,S,E,W = getTiltBounds(geo)
-
-    if eltype(lon) <: AbstractFloat
-        FT = eltype(lon)
-    end
-
-    igrid = regiongrid([N,S,E,W],lon,lat);
+    igrid = regiongrid([N(geo),S(geo),E(geo),W(geo)],lon,lat)
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
     nlon = deepcopy(lon)
 
@@ -114,7 +103,7 @@ function TiltGrid(
 
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E != W)
+    elseif iW > iE || (iW == iE && E(geo) != W(geo))
           iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
@@ -154,8 +143,8 @@ function TiltGrid(
         end
     end
 
-    while maximum(nlon) > geo.E; nlon .-= 360 end
-    while minimum(nlon) < geo.W; nlon .+= 360 end
+    while maximum(nlon) > E(geo); nlon .-= 360 end
+    while minimum(nlon) < W(geo); nlon .+= 360 end
 
     return TiltGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
 
@@ -163,9 +152,9 @@ end
 
 function PolyGrid(
     geo :: PolyRegion,
-    lon :: Vector{<:Real},
-    lat :: Vector{<:Real}
-)
+    lon :: Vector{FT},
+    lat :: Vector{FT}
+) where FT <: Real
 
     @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
 
@@ -174,10 +163,6 @@ function PolyGrid(
     S = geo.S
     E = geo.E
     W = geo.W
-
-    if eltype(lon) <: AbstractFloat
-        FT = eltype(lon)
-    end
 
     igrid = regiongrid([N,S,E,W],lon,lat);
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]

@@ -1,10 +1,10 @@
 """
-    extractGrid(
-        odata :: AbstractArray{<:Real,N},
+    extract(
+        odata :: AbstractArray{<:Real},
         ggrd  :: RegionGrid
-    ) where N <: Int -> Array{<:Real,N}
+    ) -> Array{<:Real}
 
-Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that contains data of a Parent `GeoRegion`, into another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
+Extracts data from odata, an Array that contains data of a Parent `GeoRegion`, into another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
 
 !!! warning
     Please ensure that the 1st dimension is longitude and 2nd dimension is latitude before proceeding. The order of the 3rd and 4th dimensions (when used), however, is not significant.
@@ -15,9 +15,9 @@ Arguments
 - `ggrd` : A `RegionGrid` containing detailed information on what to extract
 """
 function extract(
-    odata :: AbstractArray{<:Real},
-    ggrd  :: RectilinearGrid
-)
+    odata :: AbstractArray{FT},
+    ggrd  :: RegionGrid
+) where FT <: Real
 
     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
 	ilat  = ggrd.ilat; nlat = length(ggrd.ilat)
@@ -42,11 +42,11 @@ function extract(
 end
 
 """
-    extractGrid!(
-        odata :: AbstractArray{<:Real,N},
-        ndata :: AbstractArray{<:Real,N},
+    extract!(
+        odata :: AbstractArray{<:Real},
+        ndata :: AbstractArray{<:Real},
         ggrd  :: RegionGrid
-    ) where N <: Int -> nothing
+    ) -> nothing
 
 Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that contains data of a Parent `GeoRegion`, into ndata, another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
 
@@ -62,9 +62,9 @@ Arguments
 - `ggrd` : A `RegionGrid` containing detailed information on what to extract
 """
 function extract!(
-    ndata :: AbstractArray{<:Real},
     odata :: AbstractArray{<:Real},
-    ggrd  :: RectilinearGrid
+    ndata :: AbstractArray{<:Real},
+    ggrd  :: RegionGrid
 )
 
     ilon = ggrd.ilon; nlon = length(ggrd.ilon)
@@ -86,77 +86,3 @@ function extract!(
     return
 
 end
-
-# function extract(
-#     odata :: AbstractArray{<:Real,3},
-#     ggrd  :: RegionGrid
-# )
-
-#     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
-#     ilat  = ggrd.ilat; nlat = length(ggrd.ilat)
-#                        n3D  = size(odata,3)
-#     mask  = ggrd.mask
-# 	ndata = zeros(nlon,nlat,n3D)
-# 	for i3D = 1 : n3D, glat in 1 : nlat, glon in 1 : nlon
-# 		ndata[glon,glat,i3D] = odata[ilon[glon],ilat[glat],i3D] * mask[glon,glat]
-# 	end
-
-#     return ndata
-
-# end
-
-# function extract!(
-#     ndata :: AbstractArray{<:Real,3},
-#     odata :: AbstractArray{<:Real,3},
-#     ggrd  :: RectilinearGrid
-# )
-
-#     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
-# 	ilat  = ggrd.ilat; nlat = length(ggrd.ilat)
-#                        n3D  = size(odata,3)
-#     mask  = ggrd.mask
-# 	for i3D = 1 : n3D, glat in 1 : nlat, glon in 1 : nlon
-# 		ndata[glon,glat,i3D] = odata[ilon[glon],ilat[glat],i3D] * mask[glon,glat]
-# 	end
-
-#     return
-
-# end
-
-# function extract(
-#     odata :: AbstractArray{<:Real,4},
-#     ggrd  :: RegionGrid
-# )
-
-#     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
-#     ilat  = ggrd.ilat; nlat = length(ggrd.ilat)
-#                        n3D  = size(odata,3)
-#                        n4D  = size(odata,4)
-#     mask  = ggrd.mask
-# 	ndata = zeros(nlon,nlat,n3D,n4D)
-# 	for i4D = 1 : n4D, i3D = 1 : n3D, glat in 1 : nlat, glon in 1 : nlon
-# 		ndata[glon,glat,i3D,i4D] = odata[ilon[glon],ilat[glat],i3D,i4D] * mask[glon,glat]
-# 	end
-
-#     return ndata
-
-# end
-
-# function extract!(
-#     ndata :: AbstractArray{<:Real,4},
-#     odata :: AbstractArray{<:Real,4},
-#     ggrd  :: RectilinearGrid
-# )
-
-#     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
-# 	ilat  = ggrd.ilat; nlat = length(ggrd.ilat)
-#                        n3D  = size(odata,3)
-#                        n4D  = size(odata,4)
-#     mask  = ggrd.mask
-# 	for i4D = 1 : n4D, i3D = 1 : n3D, glat in 1 : nlat, glon in 1 : nlon
-# 		ndata[glon,glat,i3D,i4D] = odata[ilon[glon],ilat[glat],i3D,i4D] * mask[glon,glat]
-# 	end
-
-#     return
-
-# end
