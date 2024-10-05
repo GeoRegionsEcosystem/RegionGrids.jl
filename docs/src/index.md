@@ -4,8 +4,8 @@ layout: home
 
 hero:
   name: "RegionGrids.jl"
-  text: "Extraction of Gridded Data for Geospatial Data"
-  tagline: Extracting Gridded Geospatial Data for Geographic Regions of Interest.
+  text: "Extraction of Gridded Geospatial Data"
+  tagline: Subsetting and Extracting Gridded Geospatial Data for Geographic Regions of Interest.
   image:
     src: /logo.png
     alt: RegionGrids
@@ -32,6 +32,10 @@ features:
     link: /basics/predefined/datasets
 ---
 ```
+
+## Introduction
+
+RegionGrids.jl is a lightweight Julia package that builds upon [GeoRegions.jl](https://github.com/GeoRegionsEcosystem/GeoRegions.jl), and allows for the subsetting and extraction of gridded data for a given geographical region of interest.
 
 ## Installation Instructions
 

@@ -76,7 +76,7 @@ end
 
 Information on a `RectilinearGrid` type that is extracted based on a `TiltRegion` type.
 
-In addition to all the fields common to the `RegionGrid` abstract type, `TiltGrid`s type will also contain the following fields:
+In addition to all the fields common to the `RectilinearGrid` abstract type, `TiltGrid`s type will also contain the following fields:
 * `rotX` - A vector of `Float`s, defining indices of the parent longitude vector describing the region
 * `rotY` - A vector of `Float`s, defining indices of the parent latitude vector describing the region
 """
@@ -114,6 +114,24 @@ struct RegionMask{FT<:Real} <: GeneralizedGrid
      lat :: Array{FT,2}
     mask :: Array{FT,2}
     weights :: Array{FT,2}
+end
+
+"""
+    RegionTilt <: GeneralizedGrid
+
+Information on a `GeneralizedGrid` type that is extracted based on arrays of longitude/latitude points.
+
+In addition to all the fields common to the `GeneralizedGrid` abstract type, `RegionTilt`s type will also contain the following fields:
+* `rotX` - A vector of `Float`s, defining indices of the parent longitude vector describing the region
+* `rotY` - A vector of `Float`s, defining indices of the parent latitude vector describing the region
+"""
+struct RegionTilt{FT<:Real} <: GeneralizedGrid
+     lon :: Array{FT,2}
+     lat :: Array{FT,2}
+    mask :: Array{FT,2}
+    weights :: Array{FT,2}
+    rotX :: Array{FT,2}
+    rotY :: Array{FT,2}
 end
 
 """
