@@ -15,7 +15,7 @@ using Reexport
 export
         RegionGrid,
         RectilinearGrid, RectGrid, PolyGrid, TiltGrid,
-        GeneralizedGrid, RegionMask, VectorMask, VectorGrid,
+        GeneralizedGrid, RegionMask, RegionTilt, VectorMask, VectorGrid,
 
         extract, extract!
 
@@ -33,7 +33,6 @@ abstract type RegionGrid end
 A `RectilinearGrid` is a `RegionGrid` that is created based on rectilinear longitude/latitude grids. It has its own subtypes: `RectGrid`, `TiltGrid` and `PolyGrid`.
 
 All `RectilinearGrid` types contain the following fields:
-* `grid` - A vector of `Int`s, defining the gridpoint indices of the [N,S,E,W] points respectively
 * `lon` - A vector of `Float`s, defining the latitude vector describing the region
 * `lat` - A vector of `Float`s, defining the latitude vector describing the region
 * `ilon` - A vector of `Int`s, defining indices of the parent longitude vector describing the region
