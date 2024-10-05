@@ -49,7 +49,6 @@ abstract type RectilinearGrid <: RegionGrid end
 Information on a `RectilinearGrid` type that is extracted based on a `RectRegion` type.
 """
 struct RectGrid{FT<:Real} <: RectilinearGrid
-    grid :: Vector{Int}
      lon :: Vector{FT}
      lat :: Vector{FT}
     ilon :: Vector{Int}
@@ -64,7 +63,6 @@ end
 Information on a `RectilinearGrid` type that is extracted based on a `PolyRegion` type.
 """
 struct PolyGrid{FT<:Real} <: RectilinearGrid
-    grid :: Vector{Int}
      lon :: Vector{FT}
      lat :: Vector{FT}
     ilon :: Vector{Int}
@@ -83,7 +81,6 @@ In addition to all the fields common to the `RegionGrid` abstract type, `TiltGri
 * `rotY` - A vector of `Float`s, defining indices of the parent latitude vector describing the region
 """
 struct TiltGrid{FT<:Real} <: RectilinearGrid
-    grid :: Vector{Int}
      lon :: Vector{FT}
      lat :: Vector{FT}
     ilon :: Vector{Int}

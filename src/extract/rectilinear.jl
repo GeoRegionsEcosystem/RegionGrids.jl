@@ -15,9 +15,9 @@ Arguments
 - `ggrd` : A `RegionGrid` containing detailed information on what to extract
 """
 function extract(
-    odata :: AbstractArray{FT},
+    odata :: AbstractArray{<:Real},
     ggrd  :: RegionGrid
-) where FT <: Real
+)
 
     ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
 	ilat  = ggrd.ilat; nlat = length(ggrd.ilat)

@@ -47,7 +47,8 @@ function RectGrid(
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
-    igrid = regiongrid([N(geo),S(geo),E(geo),W(geo)],lon,lat);
+    _,_,E,W = geo.bound
+    igrid = regiongrid(geo.bound,lon,lat);
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
     nlon = deepcopy(lon)
 
@@ -59,7 +60,7 @@ function RectGrid(
 
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E(geo) != W(geo))
+    elseif iW > iE || (iW == iE && E != W)
           iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
@@ -77,7 +78,7 @@ function RectGrid(
     while maximum(nlon) > E(geo); nlon .-= 360 end
     while minimum(nlon) < W(geo); nlon .+= 360 end
 
-    return RectGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
+    return RectGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts)
 
 end
 
@@ -91,7 +92,8 @@ function TiltGrid(
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
-    igrid = regiongrid([N(geo),S(geo),E(geo),W(geo)],lon,lat)
+    _,_,E,W = geo.bound
+    igrid = regiongrid(geo.bound,lon,lat)
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
     nlon = deepcopy(lon)
 
@@ -103,7 +105,7 @@ function TiltGrid(
 
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E(geo) != W(geo))
+    elseif iW > iE || (iW == iE && E != W)
           iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
@@ -146,7 +148,7 @@ function TiltGrid(
     while maximum(nlon) > E(geo); nlon .-= 360 end
     while minimum(nlon) < W(geo); nlon .+= 360 end
 
-    return TiltGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
+    return TiltGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
 
 end
 
@@ -159,12 +161,9 @@ function PolyGrid(
     @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
-    N = geo.N
-    S = geo.S
-    E = geo.E
-    W = geo.W
 
-    igrid = regiongrid([N,S,E,W],lon,lat);
+    _,_,E,W = geo.bound
+    igrid = regiongrid(geo.bound,lon,lat);
     iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
     nlon = deepcopy(lon)
 
@@ -201,7 +200,7 @@ function PolyGrid(
     while maximum(nlon) > geo.E; nlon .-= 360 end
     while minimum(nlon) < geo.W; nlon .+= 360 end
 
-    return PolyGrid{FT}(igrid,nlon,nlat,iWE,iNS,mask,wgts)
+    return PolyGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts)
 
 end
 
