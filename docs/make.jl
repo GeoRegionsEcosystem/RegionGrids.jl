@@ -1,8 +1,7 @@
 using Documenter
 using DocumenterVitepress
 using RegionGrids
-# using CairoMakie
-# using Literate
+# import CairoMakie
 
 # CairoMakie.activate!(type = "svg")
 
