@@ -1,9 +1,9 @@
 """
     RegionGrid(
-        geo :: GeoRegion,
+        geo :: Union{RectRegion,PolyRegion},
         lon :: Union{Vector{<:Real},AbstractRange{<:Real},
         lat :: Union{Vector{<:Real},AbstractRange{<:Real}
-    ) -> ggrd :: RectilinearGrid
+    ) -> ggrd :: RLinearMask
 
 Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
 
@@ -18,173 +18,21 @@ Returns
 - `ggrd` : A `RectilinearGrid`
 """
 RegionGrid(
-    geo::RectRegion, lon::Vector{<:Real}, lat::Vector{<:Real}
-) = RectGrid(geo,lon,lat)
-RegionGrid(
-    geo::TiltRegion, lon::Vector{<:Real}, lat::Vector{<:Real}
-) = TiltGrid(geo,lon,lat)
-RegionGrid(
-    geo::PolyRegion, lon::Vector{<:Real}, lat::Vector{<:Real}
-) = PolyGrid(geo,lon,lat)
+    geo::GeoRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real}
+) = RegionGrid(geo,collect(lon),collect(lat))
 
-RegionGrid(
-    geo::RectRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real}
-) = RectGrid(geo,collect(lon),collect(lat))
-RegionGrid(
-    geo::TiltRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real}
-) = TiltGrid(geo,collect(lon),collect(lat))
-RegionGrid(
-    geo::PolyRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real}
-) = PolyGrid(geo,collect(lon),collect(lat))
-
-function RectGrid(
-    geo :: RectRegion,
+function RegionGrid(
+    geo :: Union{RectRegion,PolyRegion},
     lon :: Vector{FT},
     lat :: Vector{FT}
 ) where FT <: Real
 
-    @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
+    @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
-    _,_,E,W = geo.bound
-    igrid = regiongrid(geo.bound,lon,lat);
-    iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
-    nlon = deepcopy(lon)
+    nlon,nlat,iWE,iNS = bound2lonlat(geo.bound,lon,lat)
 
-    @info "$(modulelog()) - Creating vector of latitude indices to extract ..."
-    if     iN < iS; iNS = iN : iS
-    elseif iS < iN; iNS = iS : iN
-    else;           iNS = iN;
-    end
-
-    @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
-    if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E != W)
-          iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
-    else; iWE = [iW];
-    end
-
-    while maximum(nlon) > 360; nlon .-= 360 end
-    nlon = nlon[iWE]
-    nlat =  lat[iNS]
-    mask = ones(FT,length(nlon),length(nlat))
-    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
-    
-    for ilat in eachindex(nlat)
-        wgts[:,ilat] .= cosd(nlat[ilat])
-    end
-
-    while maximum(nlon) > E(geo); nlon .-= 360 end
-    while minimum(nlon) < W(geo); nlon .+= 360 end
-
-    return RectGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts)
-
-end
-
-function TiltGrid(
-    geo :: TiltRegion,
-    lon :: Vector{FT},
-    lat :: Vector{FT}
-) where FT <: Real
-
-    @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
-
-    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
-
-    _,_,E,W = geo.bound
-    igrid = regiongrid(geo.bound,lon,lat)
-    iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
-    nlon = deepcopy(lon)
-
-    @info "$(modulelog()) - Creating vector of latitude indices to extract ..."
-    if     iN < iS; iNS = vcat(iN:iS)
-    elseif iS < iN; iNS = vcat(iS:iN)
-    else;           iNS = [iN];
-    end
-
-    @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
-    if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E != W)
-          iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
-    else; iWE = [iW];
-    end
-
-    while maximum(nlon) > 360; nlon .-= 360 end
-
-    @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a TiltRegion, we need to defined a mask as well ..."
-    nlon = nlon[iWE]
-    nlat =  lat[iNS]
-    mask = Array{FT,2}(undef,length(nlon),length(nlat))
-    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
-    rotX = Array{FT,2}(undef,length(nlon),length(nlat))
-    rotY = Array{FT,2}(undef,length(nlon),length(nlat))
-
-    tlon,tlat = getTiltShape(geo)
-    tgeo = PolyRegion("","","",tlon,tlat,save=false,verbose=false)
-    
-    X = mod(geo.X,360)
-    Y = mod(geo.Y,360)
-    mlon = mod.(nlon,360)
-    mlat = mod.(nlat,360)
-
-    for ilat in eachindex(nlat), ilon in eachindex(nlon)
-        ipnt = Point2(nlon[ilon],nlat[ilat])
-        if in(ipnt,tgeo)
-            mask[ilon,ilat] = 1
-            ir = sqrt((mlon[ilon]-X)^2 + (mlat[ilat]-Y)^2)
-            iθ = atand(mlat[ilat]-Y, mlon[ilon]-X) - geo.θ
-            rotX[ilon,ilat] = ir * cosd(iθ)
-            rotY[ilon,ilat] = ir * sind(iθ)
-            wgts[ilon,ilat] = cosd.(nlat[ilat])
-        else
-            mask[ilon,ilat] = NaN
-            rotX[ilon,ilat] = NaN
-            rotY[ilon,ilat] = NaN
-            wgts[ilon,ilat] = 0
-        end
-    end
-
-    while maximum(nlon) > E(geo); nlon .-= 360 end
-    while minimum(nlon) < W(geo); nlon .+= 360 end
-
-    return TiltGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
-
-end
-
-function PolyGrid(
-    geo :: PolyRegion,
-    lon :: Vector{FT},
-    lat :: Vector{FT}
-) where FT <: Real
-
-    @info "$(modulelog()) - Creating a RegionGrid for the $(geo.name) GeoRegion"
-
-    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
-
-    _,_,E,W = geo.bound
-    igrid = regiongrid(geo.bound,lon,lat);
-    iN = igrid[1]; iS = igrid[2]; iE = igrid[3]; iW = igrid[4]
-    nlon = deepcopy(lon)
-
-    @info "$(modulelog()) - Creating vector of latitude indices to extract ..."
-    if     iN < iS; iNS = vcat(iN:iS)
-    elseif iS < iN; iNS = vcat(iS:iN)
-    else;           iNS = [iN];
-    end
-
-    @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
-    if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && E != W)
-          iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
-    else; iWE = [iW];
-    end
-
-    while maximum(nlon) > 360; nlon .-= 360 end
-
-    @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a PolyRegion, we need to defined a mask as well ..."
-    nlon = nlon[iWE]
-    nlat =  lat[iNS]
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
     wgts = Array{FT,2}(undef,length(nlon),length(nlat))
     for ilat in eachindex(nlat), ilon in eachindex(nlon)
@@ -197,28 +45,77 @@ function PolyGrid(
         end
     end
 
-    while maximum(nlon) > geo.E; nlon .-= 360 end
-    while minimum(nlon) < geo.W; nlon .+= 360 end
-
-    return PolyGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts)
+    return RLinearMask{FT}(nlon,nlat,iWE,iNS,mask,wgts)
 
 end
 
-function regionpoint(
-    plon::Real, plat::Real,
-    rlon::Vector{<:Real}, rlat::Vector{<:Real}
+"""
+    RegionGrid(
+        geo :: TiltRegion,
+        lon :: Union{Vector{<:Real},AbstractRange{<:Real},
+        lat :: Union{Vector{<:Real},AbstractRange{<:Real}
+    ) -> ggrd :: RLinearMask
+
+Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
+
+Arguments
+=========
+- `geo` : A GeoRegion of interest
+- `lon` : A vector or `AbstractRange` containing the longitude points
+- `lat` : A vector or `AbstractRange` containing the latitude points
+
+Returns
+=======
+- `ggrd` : A `RectilinearGrid`
+"""
+function RegionGrid(
+    geo :: TiltRegion,
+    lon :: Vector{FT},
+    lat :: Vector{FT}
+) where FT <: Real
+
+    @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
+
+    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
+
+    nlon,nlat,iWE,iNS = bound2lonlat(geo.bound,lon,lat)
+    X,Y,_,_,θ = geo.tilt
+
+    mask = Array{FT,2}(undef,length(nlon),length(nlat))
+    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
+
+    @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a TiltRegion, we need to defined a rotation as well ..."
+    rotX = Array{FT,2}(undef,length(nlon),length(nlat))
+    rotY = Array{FT,2}(undef,length(nlon),length(nlat))
+
+    for ilat in eachindex(nlat), ilon in eachindex(nlon)
+        ipnt = Point2(nlon[ilon],nlat[ilat])
+        if in(ipnt,geo)
+            mask[ilon,ilat] = 1
+            ir = sqrt((nlon[ilon]-X)^2 + (nlat[ilat]-Y)^2)
+            iθ = atand(nlat[ilat]-Y, nlon[ilon]-X) - θ
+            rotX[ilon,ilat] = ir * cosd(iθ)
+            rotY[ilon,ilat] = ir * sind(iθ)
+            wgts[ilon,ilat] = cosd.(nlat[ilat])
+        else
+            mask[ilon,ilat] = NaN
+            rotX[ilon,ilat] = NaN
+            rotY[ilon,ilat] = NaN
+            wgts[ilon,ilat] = 0
+        end
+    end
+
+    return RLinearTilt{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
+
+end
+
+function bound2lonlat(
+    gridbounds :: Vector{<:Real},
+    rlon :: Vector{<:Real},
+    rlat :: Vector{<:Real}
 )
 
-    plon = mod(plon,360); ispointinregion(plon,plat,rlon,rlat); rlon = mod.(rlon,360);
-    ilon = argmin(abs.(rlon.-plon)); ilat = argmin(abs.(rlat.-plat));
-
-    return [ilon,ilat]
-
-end
-
-function regiongrid(gridbounds::Vector{<:Real},rlon::Vector{<:Real},rlat::Vector{<:Real})
-
-    N,S,E,W = gridbounds; isgridinregion(gridbounds,rlon,rlat)
+    N,S,E,W = gridbounds
 
     if rlon[2] > rlon[1]; EgW = true; else; EgW = false end
     if rlat[2] > rlat[1]; NgS = true; else; NgS = false end
@@ -273,6 +170,28 @@ function regiongrid(gridbounds::Vector{<:Real},rlon::Vector{<:Real},rlat::Vector
     #     error("$(modulelog()) - The bounds of the specified georegion do not contain any longitude points")
     # end
 
-    return [iN,iS,iE,iW]
+    iN,iS,iE,iW = regiongrid(geo.bound,lon,lat)
+    nlon = deepcopy(lon)
+
+    @info "$(modulelog()) - Creating vector of latitude indices to extract ..."
+    if     iN < iS; iNS = vcat(iN:iS)
+    elseif iS < iN; iNS = vcat(iS:iN)
+    else;           iNS = [iN];
+    end
+
+    @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
+    if     iW < iE; iWE = vcat(iW:iE)
+    elseif iW > iE || (iW == iE && E != W)
+          iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
+    else; iWE = [iW];
+    end
+
+    nlon = nlon[iWE]
+    nlat =  lat[iNS]
+
+    while maximum(nlon) > E; nlon .-= 360 end
+    while minimum(nlon) < W; nlon .+= 360 end
+
+    return nlon,nlat,iWE,iNS
 
 end

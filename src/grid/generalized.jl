@@ -1,90 +1,154 @@
 """
     RegionGrid(
-        geo  :: GeoRegion,
+        geo  :: Union{RectRegion,PolyRegion},
         pnts :: Array{Point2{FT}}
-    ) where FT <: Real -> gmsk :: RegionMask
+    ) where FT <: Real -> ggrd :: GeneralMask
 
-Creates a `RegionMask` type based on the following arguments. This method is more suitable for non-rectilinear grids of longitude and latitude points, such as in the output of WRF or CESM.
+Creates a `GeneralMask` type based on the following arguments. This method is more suitable for structured non-rectilinear (e.g., curvilinear) grids of longitude and latitude points, such as in the output of WRF.
 
 Arguments
 =========
 - `geo` : A GeoRegion of interest
-- `pnts` : An array containing the longitude points
+- `pnts` : An array of `Point2` types containing the longitude/latitude points
 
 Returns
 =======
-- `gmsk` : A `RegionMask`
+- `ggrd` : A `GeneralMask`
 """
 function RegionGrid(
-    geo  :: GeoRegion,
+    geo  :: Union{RectRegion,PolyRegion},
     pnts :: Array{Point2{FT}}
 ) where FT <: Real
 
-    @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
+    @info "$(modulelog()) - Creating a GeneralizedGrid for the $(geo.name) GeoRegion"
 
-    npnt = size(pnts)
-    mask = zeros(npnt)
-    wgts = zeros(npnt)
-    lon  = zeros(npnt)
-    lat  = zeros(npnt)
+    _,_,E,W = geo.bound
 
-    for ii in eachindex(lon)
-        lon[ii] = pnts[ii][1]
-        lat[ii] = pnts[ii][2]
-        if in(pnts[ii],geo)
-            mask[ii] = 1
-            wgts[ii] = cosd.(pnts[ii][2])
+    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
+
+    nlon,nlat = size(pnts)
+    iW = nlon; iE = 1
+    iS = nlat; iN = 1
+
+    for iilat = 1 : nlat, iilon = 1 : nlon
+        if in(pnts[iilon,iilat],geo)
+            iS = min(iS,iilon); iN = max(iN,iilon)
+            iW = min(iW,iilat); iE = max(iE,iilat)
+        end
+    end
+
+    iWE = iW:iE; nlon = length(iWE)
+    iSN = iS:iN; nlat = length(iSN)
+
+    lon  = zeros(nlon,nlat)
+    lat  = zeros(nlon,nlat)
+    ilon = zeros(nlon,nlat)
+    ilat = zeros(nlon,nlat)
+    mask = zeros(nlon,nlat)
+    wgts = zeros(nlon,nlat)
+
+    for iilat = 1 : nlat, iilon = 1 : nlon
+        iiWE = iWE[iilon]; ilon[iilon,iilat] = iiWE
+        iiSN = iSN[iilat]; ilat[iilon,iilat] = iiSN
+        lon[iilon,iilat] = pnts[iiWE,iiSN][1]
+        if lon[iilon,iilat] > E; lon[iilon,iilat] -= 360 end
+        if lon[iilon,iilat] < W; lon[iilon,iilat] += 360 end
+        lat[iilon,iilat] = pnts[iiWE,iiSN][2]
+        if in(pnts[iiWE,iiSN],geo)
+            mask[iilon,iilat] = 1
+            wgts[iilon,iilat] = cosd.(lat[iilon,iilat])
         else
             mask[ii] = NaN
             wgts[ii] = 0
         end
     end
 
-    return RegionMask{FT}(lon,lat,mask,wgts)
+    return GeneralMask{FT}(lon,lat,ilon,ilat,mask,wgts)
 
 end
 
 """
-    VectorGrid(
-        geo  :: GeoRegion,
-        pnts :: Vector{Point2{FT}}
-    ) where FT <: Real -> gmsk :: VectorMask
+    RegionGrid(
+        geo  :: TiltRegion,
+        pnts :: Array{Point2{FT}}
+    ) where FT <: Real -> ggrd :: GeneralTilt
 
-Creates a `VectorMask` type based on a vector of 
+Creates a `GeneralTilt` type based on the following arguments. This method is more suitable for structured non-rectilinear (e.g., curvilinear) grids of longitude and latitude points, such as in the output of WRF.
 
 Arguments
 =========
 - `geo` : A GeoRegion of interest
-- `pnts` : A `Vector` of `Float` Types, containing the longitude points
+- `pnts` : An array of `Point2` types containing the longitude/latitude points
 
 Returns
 =======
-- `gmsk` : A `VectorMask`
+- `ggrd` : A `GeneralTilt`
 """
-function VectorGrid(
-    geo  :: GeoRegion,
-    pnts :: Vector{Point2{FT}}
+function RegionGrid(
+    geo  :: TiltRegion,
+    pnts :: Array{Point2{FT}}
 ) where FT <: Real
 
-    @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
+    @info "$(modulelog()) - Creating a GeneralizedGrid for the $(geo.name) GeoRegion"
 
-    npnt = length(pnts)
-    mask = zeros(npnt)
-    wgts = zeros(npnt)
-    lon  = zeros(npnt)
-    lat  = zeros(npnt)
+    _,_,E,W = geo.bound
+    X,Y,_,_,θ = geo.tilt
 
-    for ii in 1 : length(pnts)
-        lon[ii] = pnts[ii][1]
-        lat[ii] = pnts[ii][2]
-        if in(pnts[ii],geo)
-              mask[ii] = 1
-              wgts[ii] = cosd.(pnts[ii][2])
-        else; mask[ii] = NaN
-              wgts[ii] = 0
+    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
+
+    nlon,nlat = size(pnts)
+    iW = nlon; iE = 1
+    iS = nlat; iN = 1
+
+    for iilat = 1 : nlat, iilon = 1 : nlon
+        if in(pnts[iilon,iilat],geo)
+            iS = min(iS,iilon); iN = max(iN,iilon)
+            iW = min(iW,iilat); iE = max(iE,iilat)
         end
     end
 
-    return VectorMask{FT}(lon,lat,mask,wgts)
+    iWE = iW:iE; nlon = length(iWE)
+    iSN = iS:iN; nlat = length(iSN)
+
+    lon  = zeros(nlon,nlat)
+    lat  = zeros(nlon,nlat)
+    ilon = zeros(nlon,nlat)
+    ilat = zeros(nlon,nlat)
+    mask = zeros(nlon,nlat)
+    wgts = zeros(nlon,nlat)
+    rotX = zeros(nlon,nlat)
+    rotY = zeros(nlon,nlat)
+
+    for iilat = 1 : nlat, iilon = 1 : nlon
+        iiWE = iWE[iilon]; ilon[iilon,iilat] = iiWE
+        iiSN = iSN[iilat]; ilat[iilon,iilat] = iiSN
+        lon[iilon,iilat] = pnts[iiWE,iiSN][1]
+        if lon[iilon,iilat] > E; lon[iilon,iilat] -= 360 end
+        if lon[iilon,iilat] < W; lon[iilon,iilat] += 360 end
+        lat[iilon,iilat] = pnts[iiWE,iiSN][2]
+        if in(pnts[iiWE,iiSN],geo)
+            mask[iilon,iilat] = 1
+            wgts[iilon,iilat] = cosd.(lat[iilon,iilat])
+        else
+            mask[iilon,iilat] = NaN
+            wgts[iilon,iilat] = 0
+        end
+    end
+
+    for iilat = 1 : nlat, iilon = 1 : nlon
+        iiWE = iWE[iilon]
+        iiSN = iSN[iilat]
+        if in(pnts[iiWE,iiSN],geo)
+            ir = sqrt((lon[iilon,iilat]-X)^2 + (lat[iilon,iilat]-Y)^2)
+            iθ = atand(lat[iilon,iilat]-Y, lon[iilon,iilat]-X) - θ
+            rotX[iilon,iilat] = ir * cosd(iθ)
+            rotY[iilon,iilat] = ir * sind(iθ)
+        else
+            rotX[iilon,iilat] = NaN
+            rotY[iilon,iilat] = NaN
+        end
+    end
+
+    return GeneralTilt{FT}(lon,lat,ilon,ilat,mask,wgts,rotX,rotY)
 
 end
