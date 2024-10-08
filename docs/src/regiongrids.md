@@ -16,7 +16,7 @@ The `RegionGrid` abstract type has three subtypes:
 
 Each of these types is in turn subdivided into **two** subtypes, (1) a `-Mask` type and (2) a `-Tilt` type. The `-Tilt` types are the same as the `-Mask` types, but with additional fields that specify the _rotation_ of fields.
 
-More information can be found [here](/types)
+More information can be found [here](/types).
 
 ```@docs
 RectilinearGrid
