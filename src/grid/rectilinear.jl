@@ -170,8 +170,7 @@ function bound2lonlat(
     #     error("$(modulelog()) - The bounds of the specified georegion do not contain any longitude points")
     # end
 
-    iN,iS,iE,iW = regiongrid(geo.bound,lon,lat)
-    nlon = deepcopy(lon)
+    nlon = deepcopy(rlon)
 
     @info "$(modulelog()) - Creating vector of latitude indices to extract ..."
     if     iN < iS; iNS = vcat(iN:iS)
@@ -187,7 +186,7 @@ function bound2lonlat(
     end
 
     nlon = nlon[iWE]
-    nlat =  lat[iNS]
+    nlat = rlat[iNS]
 
     while maximum(nlon) > E; nlon .-= 360 end
     while minimum(nlon) < W; nlon .+= 360 end
