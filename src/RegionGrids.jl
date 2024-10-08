@@ -6,7 +6,6 @@ using GeoRegions
 using Logging
 
 import Base: show
-import GeoRegions: isgridinregion
 
 using Reexport
 @reexport using GeoRegions
