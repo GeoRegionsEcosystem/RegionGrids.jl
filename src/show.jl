@@ -1,71 +1,96 @@
-function show(io::IO, grd::RectGrid)
-	nlon = length(grd.ilon)
-	nlat = length(grd.ilat)
+function show(io::IO, ggrd::RLinearMask)
+	nlon = length(ggrd.ilon)
+	nlat = length(ggrd.ilat)
     print(
 		io,
-		"The Rectilinear Grid has the following properties:\n",
-		"    Grid Bounds       (grid) : ", grd.grid, '\n',
-		"    Longitude Indices (ilon) : ", grd.ilon, '\n',
-		"    Latitude Indices  (ilat) : ", grd.ilat, '\n',
-		"    Longitude Points   (lon) : ", grd.lon,  '\n',
-		"    Latitude Points    (lat) : ", grd.lat,  '\n',
-		"    Region Size (nlon * nlat) : $(nlon) lon points x $(nlat) lat points\n",
+		"The RLinearMask Grid type has the following properties:\n",
+		"    Longitude Indices     (ilon) : ", ggrd.ilon, '\n',
+		"    Latitude Indices      (ilat) : ", ggrd.ilat, '\n',
+		"    Longitude Points       (lon) : ", ggrd.lon,  '\n',
+		"    Latitude Points        (lat) : ", ggrd.lat,  '\n',
+		"    RegionGrid Mask       (mask)", '\n',
+		"    RegionGrid Weights (weights)", '\n',
+		"    RegionGrid Size              : $(nlon) lon points x $(nlat) lat points\n",
+		"    RegionGrid Validity		  : $(sum(isone.(ggrd.mask))) / $(nlon*nlat)\n"
 	)
 end
 
-function show(io::IO, grd::TiltGrid)
-	nlon = length(grd.ilon)
-	nlat = length(grd.ilat)
-	mask = grd.mask
+function show(io::IO, ggrd::RLinearTilt)
+	nlon = length(ggrd.ilon)
+	nlat = length(ggrd.ilat)
+	mask = ggrd.mask
     print(
 		io,
-		"The Tilted Grid has the following properties:\n",
-		"    Grid Bounds       (grid) : ", grd.grid, '\n',
-		"    Longitude Indices (ilon) : ", grd.ilon, '\n',
-		"    Latitude Indices  (ilat) : ", grd.ilat, '\n',
-		"    Longitude Points   (lon) : ", grd.lon,  '\n',
-		"    Latitude Points    (lat) : ", grd.lat,  '\n',
-		"    Rotated X Points  (rotX) : ", grd.rotX, '\n',
-		"    Rotated Y Points  (rotX) : ", grd.rotY, '\n',
-		"    Region Size (nlon * nlat) : $(nlon) lon points x $(nlat) lat points\n",
-		"    Region Mask (sum(mask) / (nlon * nlat)) : $(sum(isone.(mask))) / $(nlon*nlat)\n"
+		"The RLinearTilt Grid type has the following properties:\n",
+		"    Longitude Indices     (ilon) : ", ggrd.ilon, '\n',
+		"    Latitude Indices      (ilat) : ", ggrd.ilat, '\n',
+		"    Longitude Points       (lon) : ", ggrd.lon,  '\n',
+		"    Latitude Points        (lat) : ", ggrd.lat,  '\n',
+		"    RegionGrid Mask       (mask)", '\n',
+		"    RegionGrid Weights (weights)", '\n',
+		"    Rotated X Points      (rotX)", '\n',
+		"    Rotated Y Points      (rotY)", '\n',
+		"    RegionGrid Size              : $(nlon) lon points x $(nlat) lat points\n",
+		"    RegionGrid Validity		  : $(sum(isone.(ggrd.mask))) / $(nlon*nlat)\n"
 	)
 end
 
-function show(io::IO, grd::PolyGrid)
-	nlon = length(grd.ilon)
-	nlat = length(grd.ilat)
-	mask = grd.mask
+function show(io::IO, ggrd::GeneralMask)
+	nlon = size(ggrd.lon,1)
+	nlat = size(ggrd.lon,2)
     print(
 		io,
-		"The Polygonal Grid has the following properties:\n",
-		"    Grid Bounds       (grid) : ", grd.grid, '\n',
-		"    Longitude Indices (ilon) : ", grd.ilon, '\n',
-		"    Latitude Indices  (ilat) : ", grd.ilat, '\n',
-		"    Longitude Points   (lon) : ", grd.lon,  '\n',
-		"    Latitude Points    (lat) : ", grd.lat,  '\n',
-		"    Region Size (nlon * nlat) : $(nlon) lon points x $(nlat) lat points\n",
-		"    Region Mask (sum(mask) / (nlon * nlat)) : $(sum(isone.(mask))) / $(nlon*nlat)\n"
+		"The GeneralMask type has the following properties:\n",
+		"    Longitude Points   (lon)", '\n',
+		"    Latitude Points    (lat)", '\n',
+		"    RegionGrid Mask    (mask)", '\n',
+		"    RegionGrid Weights (weights)", '\n',
+		"    RegionGrid Size 	 : $(nlon) lon points x $(nlat) lat points\n",
+		"    RegionGrid Validity : $(sum(isone.(ggrd.mask))) / $(nlon*nlat)\n"
 	)
 end
 
-function show(io::IO, grd::RegionMask)
-	nlon = size(grd.lon,1)
-	nlat = size(grd.lon,2)
+function show(io::IO, ggrd::GeneralTilt)
+	nlon = size(ggrd.lon,1)
+	nlat = size(ggrd.lon,2)
     print(
 		io,
-		"The RegionMask Grid type has the following properties:\n",
-		"    Grid Size (nlon * nlat) : $(nlon) lon points x $(nlat) lat points\n",
-		"    Valid Mask Proportion   : $(sum(isone.(grd.mask))) / $(nlon*nlat)\n",
+		"The GeneralTilt type has the following properties:\n",
+		"    Longitude Points   (lon)", '\n',
+		"    Latitude Points    (lat)", '\n',
+		"    RegionGrid Mask    (mask)", '\n',
+		"    RegionGrid Weights (weights)", '\n',
+		"    Rotated X Points   (rotX)", '\n',
+		"    Rotated Y Points   (rotY)", '\n',
+		"    RegionGrid Size 	 : $(nlon) lon points x $(nlat) lat points\n",
+		"    RegionGrid Validity : $(sum(isone.(ggrd.mask))) / $(nlon*nlat)\n"
 	)
 end
 
-function show(io::IO, grd::VectorMask)
-	nlon = size(grd.lon)
+function show(io::IO, ggrd::VectorMask)
+	nlon = size(ggrd.lon)
     print(
 		io,
-		"The RegionMask Grid type has the following properties:\n",
-		"    Vector Size    (npnt) : $(nlon) points\n",
-		"    Valid Mask Proportion : $(sum(isone.(grd.mask))) / $(nlon)\n",
+		"The VectorMask Grid type has the following properties:\n",
+		"    Longitude Points       (lon) : ", ggrd.lon,  '\n',
+		"    Latitude Points        (lat) : ", ggrd.lat,  '\n',
+		"    Longitude Indices   (ipoint) : ", ggrd.ipoint, '\n',
+		"    RegionGrid Weights (weights)", '\n',
+		"    RegionGrid Size 	 : $(nlon) lon points x $(nlat) lat points\n",
+	)
+end
+
+function show(io::IO, ggrd::VectorTilt)
+	nlon = size(ggrd.lon)
+    print(
+		io,
+		"The VectorTilt Grid type has the following properties:\n",
+		"    Longitude Points       (lon) : ", ggrd.lon,  '\n',
+		"    Latitude Points        (lat) : ", ggrd.lat,  '\n',
+		"    Longitude Indices   (ipoint) : ", ggrd.ipoint, '\n',
+		"    RegionGrid Weights (weights)", '\n',
+		"    Rotated X Points      (rotX)", '\n',
+		"    Rotated Y Points      (rotY)", '\n',
+		"    RegionGrid Size 	 : $(nlon) lon points x $(nlat) lat points\n",
 	)
 end
