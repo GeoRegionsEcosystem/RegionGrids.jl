@@ -137,7 +137,7 @@ abstract type UnstructuredGrid <: RegionGrid end
 """
     VectorMask <: UnstructuredGrid
 
-Information on a `GeneralizedGrid` type that is extracted based on vectors of longitude and latitude points.
+Information on a `UnstructuredGrid` type that is extracted based on vectors of longitude and latitude points.
 """
 struct VectorMask{FT<:Real} <: UnstructuredGrid
         lon :: Vector{FT}
@@ -149,7 +149,7 @@ end
 """
     VectorTilt <: UnstructuredGrid
 
-Information on a `GeneralizedGrid` type that is extracted based on vectors of longitude and latitude points.
+Information on a `UnstructuredGrid` type that is extracted based on vectors of longitude and latitude points.
 
 A `VectorTilt` type will also contain the following fields:
 * `rotX` - A vector of `Float`s, defining indices of the parent longitude vector describing the region
