@@ -2,7 +2,6 @@ module RegionGrids
 
 ## Modules Used
 using Dates
-using GeoRegions
 using Logging
 
 import Base: show
