@@ -14,6 +14,9 @@ hero:
       text: Getting Started
       link: /regiongrids
     - theme: alt
+      text: Grid Types
+      link: /types
+    - theme: alt
       text: Tutorials
       link: /tutorials
     - theme: alt
