@@ -172,8 +172,9 @@ include("grid/rectilinear.jl")
 include("grid/generalized.jl")
 include("grid/unstructured.jl")
 
-# include("extract/rectilinear.jl")
-# include("extract/generalized.jl")
+include("extract/rectilinear.jl")
+include("extract/generalized.jl")
+include("extract/unstructured.jl")
 
 include("show.jl")
 

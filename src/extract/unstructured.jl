@@ -1,7 +1,7 @@
 """
     extract(
         odata :: AbstractArray{<:Real},
-        ggrd  :: RectilinearGrid
+        ggrd  :: UnstructuredGrid
     ) -> Array{<:Real}
 
 Extracts data from odata, an Array that contains data of a Parent `GeoRegion`, into another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
@@ -16,24 +16,22 @@ Arguments
 """
 function extract(
     odata :: AbstractArray{<:Real},
-    ggrd  :: RectilinearGrid
+    ggrd  :: UnstructuredGrid
 )
 
-    ilon  = ggrd.ilon; nlon = length(ggrd.ilon)
-	ilat  = ggrd.ilat; nlat = length(ggrd.ilat)
-    dims  = size(odata); not2D = length(dims) > 2
+    ipnts = ggrd.ipoint; npnt = length(ipnts)
+    dims = size(odata); not2D = length(dims) > 1
 
     if not2D
-        ndata = zeros(nlon,nlat,dims[3:end]...)
-        edims = map(x -> 1 : x, dims[3:end])
-        for glat in 1 : nlat, glon in 1 : nlon
-            ndata[glon,glat,edims...] = 
-            odata[ilon[glon],ilat[glat],edims...] * ggrd.mask[glon,glat]
+        ndata = zeros(npnt,dims[2:end]...)
+        edims = map(x -> 1 : x, dims[2:end])
+        for ipnt in 1 : npnt
+            ndata[ipnt,edims...] = odata[ipnts[ipnt],edims...]
         end
     else
-        ndata = zeros(nlon,nlat)
-        for glat in 1 : nlat, glon in 1 : nlon
-            ndata[glon,glat] = odata[ilon[glon],ilat[glat]] * ggrd.mask[glon,glat]
+        ndata = zeros(npnt)
+        for ipnt in 1 : npnt
+            ndata[ipnt] = odata[ipnts[ipnt]]
         end
     end
 
@@ -45,7 +43,7 @@ end
     extract!(
         odata :: AbstractArray{<:Real},
         ndata :: AbstractArray{<:Real},
-        ggrd  :: RectilinearGrid
+        ggrd  :: UnstructuredGrid
     ) -> nothing
 
 Extracts data from odata, an Array of dimension N (where N ∈ 2,3,4) that contains data of a Parent `GeoRegion`, into ndata, another Array of dimension N, containing _**only**_ within a sub `GeoRegion` we are interested in.
@@ -64,22 +62,21 @@ Arguments
 function extract!(
     ndata :: AbstractArray{<:Real},
     odata :: AbstractArray{<:Real},
-    ggrd  :: RectilinearGrid
+    ggrd  :: UnstructuredGrid
 )
 
-    ilon = ggrd.ilon; nlon = length(ggrd.ilon)
-    ilat = ggrd.ilat; nlat = length(ggrd.ilat)
-    dims = size(odata); not2D = length(dims) > 2
+    ipnts = ggrd.ipoint; npnt = length(ipnts)
+    dims = size(odata); not2D = length(dims) > 1
 
     if not2D
-        edims = map(x -> 1 : x, dims[3:end])
-        for glat in 1 : nlat, glon in 1 : nlon
-            ndata[glon,glat,edims...] = 
-            odata[ilon[glon],ilat[glat],edims...] * ggrd.mask[glon,glat]
+        edims = map(x -> 1 : x, dims[2:end])
+        for ipnt in 1 : npnt
+            ndata[ipnt,edims...] = odata[ipnts[ipnt],edims...]
         end
     else
-        for glat in 1 : nlat, glon in 1 : nlon
-            ndata[glon,glat] = odata[ilon[glon],ilat[glat]] * ggrd.mask[glon,glat]
+        ndata = zeros(npnt)
+        for ipnt in 1 : npnt
+            ndata[ipnt] = odata[ipnts[ipnt]]
         end
     end
 
