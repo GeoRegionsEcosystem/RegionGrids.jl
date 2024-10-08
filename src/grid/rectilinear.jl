@@ -181,7 +181,7 @@ function bound2lonlat(
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
     elseif iW > iE || (iW == iE && E != W)
-          iWE = vcat(iW:length(lon),1:iE); nlon[1:(iW-1)] .+= 360
+          iWE = vcat(iW:length(rlon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
 
