@@ -2,12 +2,10 @@ module RegionGrids
 
 ## Modules Used
 using Dates
+using GeoRegions
 using Logging
 
 import Base: show
-
-using Reexport
-@reexport using GeoRegions
 
 ## Exporting the following functions:
 export
