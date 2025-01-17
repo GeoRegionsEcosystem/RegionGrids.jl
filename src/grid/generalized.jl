@@ -32,8 +32,8 @@ function RegionGrid(
 
     for iilat = 1 : nlat, iilon = 1 : nlon
         if in(pnts[iilon,iilat],geo)
-            iS = min(iS,iilon); iN = max(iN,iilon)
-            iW = min(iW,iilat); iE = max(iE,iilat)
+            iS = min(iS,iilat); iN = max(iN,iilat)
+            iW = min(iW,iilon); iE = max(iE,iilon)
         end
     end
 
@@ -58,8 +58,8 @@ function RegionGrid(
             mask[iilon,iilat] = 1
             wgts[iilon,iilat] = cosd.(lat[iilon,iilat])
         else
-            mask[ii] = NaN
-            wgts[ii] = 0
+            mask[iilon,iilat] = NaN
+            wgts[iilon,iilat] = 0
         end
     end
 
@@ -102,8 +102,8 @@ function RegionGrid(
 
     for iilat = 1 : nlat, iilon = 1 : nlon
         if in(pnts[iilon,iilat],geo)
-            iS = min(iS,iilon); iN = max(iN,iilon)
-            iW = min(iW,iilat); iE = max(iE,iilat)
+            iS = min(iS,iilat); iN = max(iN,iilat)
+            iW = min(iW,iilon); iE = max(iE,iilon)
         end
     end
 
