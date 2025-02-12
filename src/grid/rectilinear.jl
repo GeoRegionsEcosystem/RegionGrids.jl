@@ -22,54 +22,7 @@ RegionGrid(
 ) = RegionGrid(geo,collect(lon),collect(lat))
 
 function RegionGrid(
-    geo :: Union{RectRegion,PolyRegion},
-    lon :: Vector{FT},
-    lat :: Vector{FT}
-) where FT <: Real
-
-    @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
-
-    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
-
-    nlon,nlat,iWE,iNS = bound2lonlat(geo.bound,lon,lat)
-
-    mask = Array{FT,2}(undef,length(nlon),length(nlat))
-    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
-    for ilat in eachindex(nlat), ilon in eachindex(nlon)
-        ipnt = Point2(nlon[ilon],nlat[ilat])
-        if in(ipnt,geo)
-              mask[ilon,ilat] = 1
-              wgts[ilon,ilat] = cosd.(nlat[ilat])
-        else; mask[ilon,ilat] = NaN
-              wgts[ilon,ilat] = 0
-        end
-    end
-
-    return RLinearMask{FT}(nlon,nlat,iWE,iNS,mask,wgts)
-
-end
-
-"""
-    RegionGrid(
-        geo :: TiltRegion,
-        lon :: Union{Vector{<:Real},AbstractRange{<:Real},
-        lat :: Union{Vector{<:Real},AbstractRange{<:Real}
-    ) -> ggrd :: RLinearMask
-
-Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
-
-Arguments
-=========
-- `geo` : A GeoRegion of interest
-- `lon` : A vector or `AbstractRange` containing the longitude points
-- `lat` : A vector or `AbstractRange` containing the latitude points
-
-Returns
-=======
-- `ggrd` : A `RectilinearGrid`
-"""
-function RegionGrid(
-    geo :: TiltRegion,
+    geo :: GeoRegion,
     lon :: Vector{FT},
     lat :: Vector{FT}
 ) where FT <: Real
@@ -105,7 +58,7 @@ function RegionGrid(
         end
     end
 
-    return RLinearTilt{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
+    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
 
 end
 
