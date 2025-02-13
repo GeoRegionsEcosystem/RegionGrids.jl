@@ -47,13 +47,13 @@ function RegionGrid(
             mask[ilon,ilat] = 1
             ir = haversine((nlon[ilon],nlat[ilat]),(Xc,Yc))
             iθ = atand(nlat[ilat]-Yc, nlon[ilon]-Xc) - geo.θ
-            rotX[ilon,ilat] = ir * cosd(iθ)
-            rotY[ilon,ilat] = ir * sind(iθ)
+            X[ilon,ilat] = ir * cosd(iθ)
+            Y[ilon,ilat] = ir * sind(iθ)
             wgts[ilon,ilat] = cosd.(nlat[ilat])
         else
             mask[ilon,ilat] = NaN
-            rotX[ilon,ilat] = NaN
-            rotY[ilon,ilat] = NaN
+            X[ilon,ilat] = NaN
+            Y[ilon,ilat] = NaN
             wgts[ilon,ilat] = 0
         end
     end
