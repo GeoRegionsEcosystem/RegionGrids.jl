@@ -31,22 +31,22 @@ function RegionGrid(
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
-    nlon,nlat,iWE,iNS = bound2lonlat(geo.bound,lon,lat)
-    X,Y,_,_,θ = geo.tilt
+    nlon,nlat,iWE,iNS = bound2lonlat(geo,lon,lat)
+    Xc,Yc = centroid(geo.geometry.polygon)
 
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
     wgts = Array{FT,2}(undef,length(nlon),length(nlat))
 
     @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a TiltRegion, we need to defined a rotation as well ..."
-    rotX = Array{FT,2}(undef,length(nlon),length(nlat))
-    rotY = Array{FT,2}(undef,length(nlon),length(nlat))
+    X = Array{FT,2}(undef,length(nlon),length(nlat))
+    Y = Array{FT,2}(undef,length(nlon),length(nlat))
 
     for ilat in eachindex(nlat), ilon in eachindex(nlon)
         ipnt = Point2(nlon[ilon],nlat[ilat])
         if in(ipnt,geo)
             mask[ilon,ilat] = 1
-            ir = sqrt((nlon[ilon]-X)^2 + (nlat[ilat]-Y)^2)
-            iθ = atand(nlat[ilat]-Y, nlon[ilon]-X) - θ
+            ir = haversine((nlon[ilon],nlat[ilat]),(Xc,Yc))
+            iθ = atand(nlat[ilat]-Yc, nlon[ilon]-Xc) - geo.θ
             rotX[ilon,ilat] = ir * cosd(iθ)
             rotY[ilon,ilat] = ir * sind(iθ)
             wgts[ilon,ilat] = cosd.(nlat[ilat])
@@ -58,17 +58,20 @@ function RegionGrid(
         end
     end
 
-    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
+    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,X,Y,geo.θ)
 
 end
 
 function bound2lonlat(
-    gridbounds :: Vector{<:Real},
+    gridbounds :: GeoRegion,
     rlon :: Vector{<:Real},
     rlat :: Vector{<:Real}
 )
 
-    N,S,E,W = gridbounds
+    N = geo.N
+    S = geo.S
+    E = geo.E
+    W = geo.W
 
     if rlon[2] > rlon[1]; EgW = true; else; EgW = false end
     if rlat[2] > rlat[1]; NgS = true; else; NgS = false end

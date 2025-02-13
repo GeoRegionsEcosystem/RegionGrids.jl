@@ -22,16 +22,15 @@ function RegionGrid(
 
     @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
-    _,_,E,W = geo.bound
-    X,Y,_,_,θ = geo.tilt
+    Xc,Yc = centroid(geo.geometry.polygon)
 
     npnt = length(pnts)
     lon  = zeros(npnt)
     lat  = zeros(npnt)
     ipnt = zeros(npnt)
     wgts = zeros(npnt)
-    rotX = zeros(npnt)
-    rotY = zeros(npnt)
+    X = zeros(npnt)
+    Y = zeros(npnt)
 
     for ii in 1 : npnt
         if in(pnts[ii],geo); ipnt[ii] = ii; else; ipnt[ii] = NaN end
@@ -42,16 +41,16 @@ function RegionGrid(
 
     for ii = 1 : npnt
         lon[ii] = pnts[ipnt[ii]][1]
-        if lon[ii] > E; lon[ii] -= 360 end
-        if lon[ii] < W; lon[ii] += 360 end
+        if lon[ii] > geo.E; lon[ii] -= 360 end
+        if lon[ii] < geo.W; lon[ii] += 360 end
         lat[ii] = pnts[ipnt[ii]][2]
         wgts[ii] = cosd(pnts[ipnt[ii]][2])
-        ir = sqrt((lon[ii]-X)^2 + (lat[ii]-Y)^2)
-        iθ = atand(lat[ii]-Y, lon[ii]-X) - θ
-        rotX[ii] = ir * cosd(iθ)
-        rotY[ii] = ir * sind(iθ)
+        ir = haversine((lon[ii],lat[ii]),(Xc,Yc))
+        iθ = atand(lat[ii]-Yc,lon[ii]-Xc) - geo.θ
+        X[ii] = ir * cosd(iθ)
+        Y[ii] = ir * sind(iθ)
     end
 
-    return VectorTilt{FT}(lon,lat,ipnt,wgts,rotX,rotY)
+    return VectorTilt{FT}(lon,lat,ipnt,wgts,X,Y,geo.θ)
 
 end

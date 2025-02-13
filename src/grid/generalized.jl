@@ -22,9 +22,6 @@ function RegionGrid(
 
     @info "$(modulelog()) - Creating a GeneralizedGrid for the $(geo.name) GeoRegion"
 
-    _,_,E,W = geo.bound
-    X,Y,_,_,θ = geo.tilt
-
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
     nlon,nlat = size(pnts)
@@ -38,6 +35,8 @@ function RegionGrid(
         end
     end
 
+    Xc,Yc = centroid(geo.geometry.polygon)
+
     iWE = iW:iE; nlon = length(iWE)
     iSN = iS:iN; nlat = length(iSN)
 
@@ -47,15 +46,15 @@ function RegionGrid(
     ilat = zeros(nlon,nlat)
     mask = zeros(nlon,nlat)
     wgts = zeros(nlon,nlat)
-    rotX = zeros(nlon,nlat)
-    rotY = zeros(nlon,nlat)
+    X = zeros(nlon,nlat)
+    Y = zeros(nlon,nlat)
 
     for iilat = 1 : nlat, iilon = 1 : nlon
         iiWE = iWE[iilon]; ilon[iilon,iilat] = iiWE
         iiSN = iSN[iilat]; ilat[iilon,iilat] = iiSN
         lon[iilon,iilat] = pnts[iiWE,iiSN][1]
-        if lon[iilon,iilat] > E; lon[iilon,iilat] -= 360 end
-        if lon[iilon,iilat] < W; lon[iilon,iilat] += 360 end
+        if lon[iilon,iilat] > geo.E; lon[iilon,iilat] -= 360 end
+        if lon[iilon,iilat] < geo.W; lon[iilon,iilat] += 360 end
         lat[iilon,iilat] = pnts[iiWE,iiSN][2]
         if in(pnts[iiWE,iiSN],geo)
             mask[iilon,iilat] = 1
@@ -70,16 +69,16 @@ function RegionGrid(
         iiWE = iWE[iilon]
         iiSN = iSN[iilat]
         if in(pnts[iiWE,iiSN],geo)
-            ir = sqrt((lon[iilon,iilat]-X)^2 + (lat[iilon,iilat]-Y)^2)
-            iθ = atand(lat[iilon,iilat]-Y, lon[iilon,iilat]-X) - θ
-            rotX[iilon,iilat] = ir * cosd(iθ)
-            rotY[iilon,iilat] = ir * sind(iθ)
+            ir = haversine((lon[iilon,iilat],lat[iilon,iilat]),(Xc,Yc))
+            iθ = atand(lat[iilon,iilat]-Yc,lon[iilon,iilat]-Xc) - geo.θ
+            X[iilon,iilat] = ir * cosd(iθ)
+            Y[iilon,iilat] = ir * sind(iθ)
         else
-            rotX[iilon,iilat] = NaN
-            rotY[iilon,iilat] = NaN
+            X[iilon,iilat] = NaN
+            Y[iilon,iilat] = NaN
         end
     end
 
-    return GeneralizedGrid{FT}(lon,lat,ilon,ilat,mask,wgts,rotX,rotY)
+    return GeneralizedGrid{FT}(lon,lat,ilon,ilat,mask,wgts,X,Y,geo.θ)
 
 end
