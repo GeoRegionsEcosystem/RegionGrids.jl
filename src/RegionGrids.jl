@@ -2,6 +2,8 @@ module RegionGrids
 
 ## Modules Used
 using Dates
+using Distances
+using GeometryOps
 using GeoRegions
 using Logging
 
@@ -33,15 +35,15 @@ All `RectilinearGrid` types contain the following fields:
 * `weights` - An array of `Float`s, defining the latitude-weights of each valid point in the grid.
 """
 struct RectilinearGrid{FT<:Real} <: RegionGrid
-         lon :: Vector{FT}
-         lat :: Vector{FT}
-        ilon :: Vector{Int}
-        ilat :: Vector{Int}
-        mask :: Array{FT,2}
-     weights :: Array{FT,2}
-    rotation :: FT
-           X :: FT
-           Y :: FT
+        lon :: Vector{FT}
+        lat :: Vector{FT}
+       ilon :: Vector{Int}
+       ilat :: Vector{Int}
+       mask :: Array{FT,2}
+    weights :: Array{FT,2}
+          X :: Array{FT,2}
+          Y :: Array{FT,2}
+          θ :: FT
 end
 
 """
@@ -56,15 +58,15 @@ All `GeneralizedGrid` type will contain the following fields:
 * `weights` - An array of `Float`s, defining the latitude-weights of each valid point in the grid.
 """
 struct GeneralizedGrid{FT<:Real} <: RegionGrid
-         lon :: Array{FT,2}
-         lat :: Array{FT,2}
-        ilon :: Array{Int}
-        ilat :: Array{Int}
-        mask :: Array{FT,2}
-     weights :: Array{FT,2}
-    rotation :: FT
-           X :: FT
-           Y :: FT
+        lon :: Array{FT,2}
+        lat :: Array{FT,2}
+       ilon :: Array{Int}
+       ilat :: Array{Int}
+       mask :: Array{FT,2}
+    weights :: Array{FT,2}
+          X :: Array{FT,2}
+          Y :: Array{FT,2}
+          θ :: FT
 end
 
 """
@@ -79,13 +81,13 @@ All `UnstructuredGrid` type will contain the following fields:
 * `weights` - A vector of `Float`s, defining the latitude-weights of each valid point in the grid.
 """
 struct UnstructuredGrid{FT<:Real} <: RegionGrid
-         lon :: Vector{FT}
-         lat :: Vector{FT}
-      ipoint :: Array{Int}
-     weights :: Vector{FT}
-    rotation :: FT
-           X :: FT
-           Y :: FT
+        lon :: Vector{FT}
+        lat :: Vector{FT}
+     ipoint :: Array{Int}
+    weights :: Vector{FT}
+          X :: FT
+          Y :: FT
+          θ :: FT
 end
 
 modulelog() = "$(now()) - RegionGrids.jl"
