@@ -120,9 +120,9 @@ function bound2lonlat(
     if rlon[2] > rlon[1]; EgW = true; else; EgW = false end
     if rlat[2] > rlat[1]; NgS = true; else; NgS = false end
 
-    modE = mod(E,360); modW = mod(W,360); nlon = mod.(rlon,360);
+    E = mod(E,360); W = mod(W,360); nlon = mod.(rlon,360);
     iN = argmin(abs.(rlat.-N)); iS = argmin(abs.(rlat.-S)); iW = argmin(abs.(nlon.-W));
-    if modE == modW;
+    if E == W;
         if gridbounds[3] != gridbounds[4]
             if iW != 1; iE = iW - 1; else; iE = length(nlon); end
         else
@@ -136,7 +136,7 @@ function bound2lonlat(
     end
 
     if !(E==W) || (gridbounds[3] == gridbounds[4])
-        while mod(rlon[iW],360) < modW
+        while mod(rlon[iW],360) < mod(W,360)
             if EgW
                 iW += 1; if iW > length(rlon); iW = 1 end
             else
@@ -144,7 +144,7 @@ function bound2lonlat(
             end
         end
 
-        while mod(rlon[iE],360) > modE
+        while mod(rlon[iE],360) > mod(E,360)
             if EgW
                 iE -= 1; if iszero(iE); iE = length(rlon) end
             else
