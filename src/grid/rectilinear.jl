@@ -136,7 +136,7 @@ function bound2lonlat(
 
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && modE != modW)
+    elseif iW > iE || (iW == iE && gridbounds[3] != gridbounds[4])
         iWE = vcat(iW:length(rlon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
@@ -144,8 +144,8 @@ function bound2lonlat(
     nlon = nlon[iWE]
     nlat = rlat[iNS]
 
-    while maximum(nlon) > E; nlon .-= 360 end
-    while minimum(nlon) < W; nlon .+= 360 end
+    while maximum(nlon) > gridbounds[3]; nlon .-= 360 end
+    while minimum(nlon) < gridbounds[4]; nlon .+= 360 end
 
     return nlon,nlat,iWE,iNS
 
