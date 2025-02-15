@@ -84,8 +84,7 @@ fig
 ## API
 
 ```@docs
-RegionGrid(::RectRegion,::Vector{<:Real},::Vector{<:Real})
-RegionGrid(::GeoRegion,::Array{<:Real,2},::Array{<:Real,2})
+RegionGrid()
 ```
 
 ---

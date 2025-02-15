@@ -86,8 +86,8 @@ fig
 ## API
 
 ```@docs
-extractGrid
-extractGrid!
+extract
+extract!
 ```
 
 ---
