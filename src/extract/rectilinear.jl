@@ -11,8 +11,8 @@ Extracts data from odata, an Array that contains data of a Parent `GeoRegion`, i
 
 Arguments
 =========
-- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from
-- `ggrd` : A `RegionGrid` containing detailed information on what to extract
+- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from.
+- `ggrd` : A `RegionGrid` containing detailed information on what to extract.
 """
 function extract(
     odata :: AbstractArray{<:Real},
@@ -43,8 +43,8 @@ end
 
 """
     extract!(
-        odata :: AbstractArray{<:Real},
         ndata :: AbstractArray{<:Real},
+        odata :: AbstractArray{<:Real},
         ggrd  :: RectilinearGrid
     ) -> nothing
 
@@ -57,9 +57,9 @@ This allows for iterable in-place modification to save memory space and reduce a
 
 Arguments
 =========
-- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from
-- `ndata` : An array of dimension N meant as a placeholder for the extracted data to minimize allocations
-- `ggrd` : A `RegionGrid` containing detailed information on what to extract
+- `ndata` : An array of dimension N meant as a placeholder for the extracted data to minimize allocations.
+- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from.
+- `ggrd` : A `RegionGrid` containing detailed information on what to extract.
 """
 function extract!(
     ndata :: AbstractArray{<:Real},
