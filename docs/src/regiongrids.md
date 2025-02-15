@@ -14,8 +14,6 @@ The `RegionGrid` abstract type has three subtypes:
 2. `GeneralizedGrid` type, which is for the extraction of data on non-rectilinear lon-lat grids, such as a curvilinear grid.
 3. `UnstructuredGrid` type, which is for the extraction of data on unstructured lon-lat grids such as a cubed-spherical grid, or an unstructured mesh.
 
-Each of these types is in turn subdivided into **two** subtypes, (1) a `-Mask` type and (2) a `-Tilt` type. The `-Tilt` types are the same as the `-Mask` types, but with additional fields that specify the _rotation_ of fields.
-
 More information can be found [here](/types).
 
 ```@docs

@@ -19,11 +19,6 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Getting Started" => "regiongrids.md",
-        "Types of RegionGrids" => [
-            "Rectilinear Grids"  => "types/rectilinear.md",
-            "Generalized Grids"  => "types/generalized.md",
-            "Unstructured Grids" => "types/unstructured.md"
-        ],
     ],
 )
 
