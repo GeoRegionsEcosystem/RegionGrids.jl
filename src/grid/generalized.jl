@@ -14,7 +14,7 @@ Arguments
 
 Keyword Arguments
 =================
-- `rotation` : Angle (in degrees) at which to "unrotate" the gridded data about the GeoRegion centroid and project into the X-Y cartesian coordinate system (in meters).
+- `rotation` : Angle (in degrees) of rotation for the final "derotated" data about the GeoRegion centroid and projected into the X-Y cartesian coordinate system (in meters). A positive value relative to `geo.θ` will turn the final values about the centroid in the anti-clockwise direction. Default is 0.
 
 Returns
 =======
