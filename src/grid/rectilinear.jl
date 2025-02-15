@@ -52,16 +52,13 @@ function RegionGrid(
         ipnt = Point2(nlon[ilon],nlat[ilat])
         if in(ipnt,geo)
             mask[ilon,ilat] = 1
-            ir = haversine((nlon[ilon],nlat[ilat]),(Xc,Yc))
-            iθ = atand(nlat[ilat]-Yc, nlon[ilon]-Xc) - (geo.θ - rotation)
-            X[ilon,ilat] = ir * cosd(iθ)
-            Y[ilon,ilat] = ir * sind(iθ)
             wgts[ilon,ilat] = cosd.(nlat[ilat])
+            X[ilon,ilat], Y[ilon,ilat] = derotatepoint(ipnt,geo,rotation=rotation)
         else
             mask[ilon,ilat] = NaN
+            wgts[ilon,ilat] = NaN
             X[ilon,ilat] = NaN
             Y[ilon,ilat] = NaN
-            wgts[ilon,ilat] = 0
         end
     end
 

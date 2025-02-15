@@ -41,8 +41,6 @@ function RegionGrid(
         end
     end
 
-    Xc,Yc = geo.geometry.centroid
-
     iWE = iW:iE; nlon = length(iWE)
     iSN = iS:iN; nlat = length(iSN)
 
@@ -62,24 +60,14 @@ function RegionGrid(
         if lon[iilon,iilat] > geo.E; lon[iilon,iilat] -= 360 end
         if lon[iilon,iilat] < geo.W; lon[iilon,iilat] += 360 end
         lat[iilon,iilat] = pnts[iiWE,iiSN][2]
-        if in(pnts[iiWE,iiSN],geo)
+        iipnt = pnts[iiWE,iiSN]
+        if in(iipnt,geo)
             mask[iilon,iilat] = 1
             wgts[iilon,iilat] = cosd.(lat[iilon,iilat])
+            X[iilon,iilat], Y[iilon,iilat] = derotatepoint(iipnt,geo,rotation=rotation)
         else
             mask[iilon,iilat] = NaN
-            wgts[iilon,iilat] = 0
-        end
-    end
-
-    for iilat = 1 : nlat, iilon = 1 : nlon
-        iiWE = iWE[iilon]
-        iiSN = iSN[iilat]
-        if in(pnts[iiWE,iiSN],geo)
-            ir = haversine((lon[iilon,iilat],lat[iilon,iilat]),(Xc,Yc))
-            iθ = atand(lat[iilon,iilat]-Yc,lon[iilon,iilat]-Xc) - (geo.θ - rotation)
-            X[iilon,iilat] = ir * cosd(iθ)
-            Y[iilon,iilat] = ir * sind(iθ)
-        else
+            wgts[iilon,iilat] = NaN
             X[iilon,iilat] = NaN
             Y[iilon,iilat] = NaN
         end

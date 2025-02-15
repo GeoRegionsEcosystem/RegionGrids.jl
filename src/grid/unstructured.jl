@@ -28,8 +28,6 @@ function RegionGrid(
 
     @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
-    Xc,Yc = geo.geometry.centroid
-
     npnt = length(pnts)
     lon  = zeros(npnt)
     lat  = zeros(npnt)
@@ -51,10 +49,7 @@ function RegionGrid(
         if lon[ii] < geo.W; lon[ii] += 360 end
         lat[ii] = pnts[ipnt[ii]][2]
         wgts[ii] = cosd(pnts[ipnt[ii]][2])
-        ir = haversine((lon[ii],lat[ii]),(Xc,Yc))
-        iθ = atand(lat[ii]-Yc,lon[ii]-Xc) - (geo.θ - rotation)
-        X[ii] = ir * cosd(iθ)
-        Y[ii] = ir * sind(iθ)
+        X[ii],Y[ii] = derotatepoint(lon[ii],lat[ii],geo,rotation=rotation)
     end
 
     return VectorTilt{FT}(lon,lat,ipnt,wgts,X,Y,rotation)
