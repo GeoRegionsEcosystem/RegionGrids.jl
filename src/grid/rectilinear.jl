@@ -39,7 +39,6 @@ function RegionGrid(
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
     nlon,nlat,iWE,iNS = bound2lonlat([geo.N,geo.S,geo.E,geo.W],lon,lat)
-    Xc,Yc = geo.geometry.centroid
 
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
     wgts = Array{FT,2}(undef,length(nlon),length(nlat))

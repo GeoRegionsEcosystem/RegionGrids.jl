@@ -57,8 +57,8 @@ function RegionGrid(
         iiWE = iWE[iilon]; ilon[iilon,iilat] = iiWE
         iiSN = iSN[iilat]; ilat[iilon,iilat] = iiSN
         lon[iilon,iilat] = pnts[iiWE,iiSN][1]
-        if lon[iilon,iilat] > geo.E; lon[iilon,iilat] -= 360 end
-        if lon[iilon,iilat] < geo.W; lon[iilon,iilat] += 360 end
+        lon[iilon,iilat] > geo.E ? lon[iilon,iilat] -= 360 : nothing
+        lon[iilon,iilat] < geo.W ? lon[iilon,iilat] += 360 : nothing
         lat[iilon,iilat] = pnts[iiWE,iiSN][2]
         iipnt = pnts[iiWE,iiSN]
         if in(iipnt,geo)

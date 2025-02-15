@@ -44,12 +44,13 @@ function RegionGrid(
     npnt = length(ipnt)
 
     for ii = 1 : npnt
-        lon[ii] = pnts[ipnt[ii]][1]
-        if lon[ii] > geo.E; lon[ii] -= 360 end
-        if lon[ii] < geo.W; lon[ii] += 360 end
-        lat[ii] = pnts[ipnt[ii]][2]
-        wgts[ii] = cosd(pnts[ipnt[ii]][2])
-        X[ii],Y[ii] = derotatepoint(lon[ii],lat[ii],geo,rotation=rotation)
+        iipnt = pnts[ipnt[ii]]
+        lon[ii] = iipnt[1]
+        lon[ii] > geo.E ? lon[ii] -= 360 : nothing
+        lon[ii] < geo.W ? lon[ii] += 360 : nothing
+        lat[ii] = iipnt[2]
+        wgts[ii] = cosd(iipnt[2])
+        X[ii],Y[ii] = derotatepoint(iipnt,geo,rotation=rotation)
     end
 
     return VectorTilt{FT}(lon,lat,ipnt,wgts,X,Y,rotation)
