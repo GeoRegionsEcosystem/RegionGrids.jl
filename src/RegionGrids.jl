@@ -2,6 +2,8 @@ module RegionGrids
 
 ## Modules Used
 using Dates
+using Distances
+using GeometryOps
 using GeoRegions
 using Logging
 
@@ -9,10 +11,7 @@ import Base: show
 
 ## Exporting the following functions:
 export
-        RegionGrid,
-        RectilinearGrid,  RLinearMask, RLinearTilt,
-        GeneralizedGrid,  GeneralMask, GeneralTilt, 
-        UnstructuredGrid, VectorMask,  VectorTilt,
+        RegionGrid, RectilinearGrid, GeneralizedGrid, UnstructuredGrid,
 
         extract, extract!
 
@@ -35,40 +34,16 @@ All `RectilinearGrid` types contain the following fields:
 * `mask` - An array of NaNs and 1s, defining a non-rectilinear shape within a rectilinear grid where data is valid (only available in PolyGrid types)
 * `weights` - An array of `Float`s, defining the latitude-weights of each valid point in the grid.
 """
-abstract type RectilinearGrid <: RegionGrid end
-
-"""
-    RLinearMask <: RectilinearGrid
-
-Information on a `RLinearMask` type that is extracted based on a `RectRegion` or `PolyRegion` GeoRegion type.
-"""
-struct RLinearMask{FT<:Real} <: RectilinearGrid
-     lon :: Vector{FT}
-     lat :: Vector{FT}
-    ilon :: Vector{Int}
-    ilat :: Vector{Int}
-    mask :: Array{FT,2}
+struct RectilinearGrid{FT<:Real} <: RegionGrid
+        lon :: Vector{FT}
+        lat :: Vector{FT}
+       ilon :: Vector{Int}
+       ilat :: Vector{Int}
+       mask :: Array{FT,2}
     weights :: Array{FT,2}
-end
-
-"""
-    RLinearTilt <: RectilinearGrid
-
-Information on a `RectilinearGrid` type that is extracted based on a `TiltRegion` type.
-
-In addition to all the fields common to the `RectilinearGrid` abstract type, `TiltGrid`s type will also contain the following fields:
-* `rotX` - An array of `Float`s, defining indices of the parent longitude vector describing the region
-* `rotY` - An array of `Float`s, defining indices of the parent latitude vector describing the region
-"""
-struct RLinearTilt{FT<:Real} <: RectilinearGrid
-     lon :: Vector{FT}
-     lat :: Vector{FT}
-    ilon :: Vector{Int}
-    ilat :: Vector{Int}
-    mask :: Array{FT,2}
-    weights :: Array{FT,2}
-    rotX :: Array{FT,2}
-    rotY :: Array{FT,2}
+          X :: Array{FT,2}
+          Y :: Array{FT,2}
+          θ :: FT
 end
 
 """
@@ -82,40 +57,16 @@ All `GeneralizedGrid` type will contain the following fields:
 * `mask` - An array of NaNs and 1s, defining the region within the original field in which data points are valid
 * `weights` - An array of `Float`s, defining the latitude-weights of each valid point in the grid.
 """
-abstract type GeneralizedGrid <: RegionGrid end
-
-"""
-    GeneralMask <: GeneralizedGrid
-
-Information on a `GeneralizedGrid` type that is extracted based on arrays of longitude/latitude points.
-"""
-struct GeneralMask{FT<:Real} <: GeneralizedGrid
-     lon :: Array{FT,2}
-     lat :: Array{FT,2}
-    ilon :: Array{Int}
-    ilat :: Array{Int}
-    mask :: Array{FT,2}
+struct GeneralizedGrid{FT<:Real} <: RegionGrid
+        lon :: Array{FT,2}
+        lat :: Array{FT,2}
+       ilon :: Array{Int}
+       ilat :: Array{Int}
+       mask :: Array{FT,2}
     weights :: Array{FT,2}
-end
-
-"""
-    GeneralTilt <: GeneralizedGrid
-
-Information on a `GeneralizedGrid` type that is extracted based on arrays of longitude/latitude points.
-
-In addition to all the fields common to the `GeneralizedGrid` abstract type, `RegionTilt`s type will also contain the following fields:
-* `rotX` - An array of `Float`s, defining indices of the parent longitude vector describing the region
-* `rotY` - An array of `Float`s, defining indices of the parent latitude vector describing the region
-"""
-struct GeneralTilt{FT<:Real} <: GeneralizedGrid
-     lon :: Array{FT,2}
-     lat :: Array{FT,2}
-    ilon :: Array{Int}
-    ilat :: Array{Int}
-    mask :: Array{FT,2}
-    weights :: Array{FT,2}
-    rotX :: Array{FT,2}
-    rotY :: Array{FT,2}
+          X :: Array{FT,2}
+          Y :: Array{FT,2}
+          θ :: FT
 end
 
 """
@@ -129,36 +80,14 @@ All `UnstructuredGrid` type will contain the following fields:
 * `mask` - A vector of NaNs and 1s, defining the region within the original field in which data points are valid
 * `weights` - A vector of `Float`s, defining the latitude-weights of each valid point in the grid.
 """
-abstract type UnstructuredGrid <: RegionGrid end
-
-"""
-    VectorMask <: UnstructuredGrid
-
-Information on a `UnstructuredGrid` type that is extracted based on vectors of longitude and latitude points.
-"""
-struct VectorMask{FT<:Real} <: UnstructuredGrid
+struct UnstructuredGrid{FT<:Real} <: RegionGrid
         lon :: Vector{FT}
         lat :: Vector{FT}
      ipoint :: Array{Int}
     weights :: Vector{FT}
-end
-
-"""
-    VectorTilt <: UnstructuredGrid
-
-Information on a `UnstructuredGrid` type that is extracted based on vectors of longitude and latitude points.
-
-A `VectorTilt` type will also contain the following fields:
-* `rotX` - A vector of `Float`s, defining indices of the parent longitude vector describing the region
-* `rotY` - A vector of `Float`s, defining indices of the parent latitude vector describing the region
-"""
-struct VectorTilt{FT<:Real} <: UnstructuredGrid
-        lon :: Vector{FT}
-        lat :: Vector{FT}
-     ipoint :: Array{Int}
-    weights :: Vector{FT}
-       rotX :: Vector{FT}
-       rotY :: Vector{FT}
+          X :: FT
+          Y :: FT
+          θ :: FT
 end
 
 modulelog() = "$(now()) - RegionGrids.jl"

@@ -2,110 +2,64 @@
     RegionGrid(
         geo :: Union{RectRegion,PolyRegion},
         lon :: Union{Vector{<:Real},AbstractRange{<:Real},
-        lat :: Union{Vector{<:Real},AbstractRange{<:Real}
+        lat :: Union{Vector{<:Real},AbstractRange{<:Real};
+        rotation :: Real = geo.θ
     ) -> ggrd :: RLinearMask
 
 Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
 
 Arguments
 =========
-- `geo` : A GeoRegion of interest
-- `lon` : A vector or `AbstractRange` containing the longitude points
-- `lat` : A vector or `AbstractRange` containing the latitude points
+- `geo` : A GeoRegion of interest.
+- `lon` : A vector or `AbstractRange` containing the longitude points.
+- `lat` : A vector or `AbstractRange` containing the latitude points.
+
+Keyword Arguments
+=================
+- `rotation` : Angle (in degrees) at which to "unrotate" the gridded data about the GeoRegion centroid and project into the X-Y cartesian coordinate system (in meters).
 
 Returns
 =======
-- `ggrd` : A `RectilinearGrid`
+- `ggrd` : A `RectilinearGrid`.
 """
 RegionGrid(
-    geo::GeoRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real}
-) = RegionGrid(geo,collect(lon),collect(lat))
+    geo::GeoRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real};
+    rotation :: Real = 0
+) = RegionGrid(geo,collect(lon),collect(lat),rotation=rotation)
 
 function RegionGrid(
-    geo :: Union{RectRegion,PolyRegion},
+    geo :: GeoRegion,
     lon :: Vector{FT},
-    lat :: Vector{FT}
+    lat :: Vector{FT};
+    rotation :: Real = 0
 ) where FT <: Real
 
     @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
-    nlon,nlat,iWE,iNS = bound2lonlat(geo.bound,lon,lat)
-
-    mask = Array{FT,2}(undef,length(nlon),length(nlat))
-    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
-    for ilat in eachindex(nlat), ilon in eachindex(nlon)
-        ipnt = Point2(nlon[ilon],nlat[ilat])
-        if in(ipnt,geo)
-              mask[ilon,ilat] = 1
-              wgts[ilon,ilat] = cosd.(nlat[ilat])
-        else; mask[ilon,ilat] = NaN
-              wgts[ilon,ilat] = 0
-        end
-    end
-
-    return RLinearMask{FT}(nlon,nlat,iWE,iNS,mask,wgts)
-
-end
-
-"""
-    RegionGrid(
-        geo :: TiltRegion,
-        lon :: Union{Vector{<:Real},AbstractRange{<:Real},
-        lat :: Union{Vector{<:Real},AbstractRange{<:Real}
-    ) -> ggrd :: RLinearMask
-
-Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
-
-Arguments
-=========
-- `geo` : A GeoRegion of interest
-- `lon` : A vector or `AbstractRange` containing the longitude points
-- `lat` : A vector or `AbstractRange` containing the latitude points
-
-Returns
-=======
-- `ggrd` : A `RectilinearGrid`
-"""
-function RegionGrid(
-    geo :: TiltRegion,
-    lon :: Vector{FT},
-    lat :: Vector{FT}
-) where FT <: Real
-
-    @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
-
-    @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
-
-    nlon,nlat,iWE,iNS = bound2lonlat(geo.bound,lon,lat)
-    X,Y,_,_,θ = geo.tilt
+    nlon,nlat,iWE,iNS = bound2lonlat([geo.N,geo.S,geo.E,geo.W],lon,lat)
 
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
     wgts = Array{FT,2}(undef,length(nlon),length(nlat))
 
     @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a TiltRegion, we need to defined a rotation as well ..."
-    rotX = Array{FT,2}(undef,length(nlon),length(nlat))
-    rotY = Array{FT,2}(undef,length(nlon),length(nlat))
+    X = Array{FT,2}(undef,length(nlon),length(nlat))
+    Y = Array{FT,2}(undef,length(nlon),length(nlat))
 
     for ilat in eachindex(nlat), ilon in eachindex(nlon)
         ipnt = Point2(nlon[ilon],nlat[ilat])
+        X[ilon,ilat], Y[ilon,ilat] = derotatepoint(ipnt,geo,rotation=rotation)
         if in(ipnt,geo)
             mask[ilon,ilat] = 1
-            ir = sqrt((nlon[ilon]-X)^2 + (nlat[ilat]-Y)^2)
-            iθ = atand(nlat[ilat]-Y, nlon[ilon]-X) - θ
-            rotX[ilon,ilat] = ir * cosd(iθ)
-            rotY[ilon,ilat] = ir * sind(iθ)
             wgts[ilon,ilat] = cosd.(nlat[ilat])
         else
             mask[ilon,ilat] = NaN
-            rotX[ilon,ilat] = NaN
-            rotY[ilon,ilat] = NaN
-            wgts[ilon,ilat] = 0
+            wgts[ilon,ilat] = NaN
         end
     end
 
-    return RLinearTilt{FT}(nlon,nlat,iWE,iNS,mask,wgts,rotX,rotY)
+    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,X,Y,rotation)
 
 end
 
@@ -180,16 +134,16 @@ function bound2lonlat(
 
     @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
-    elseif iW > iE || (iW == iE && modE != modW)
-          iWE = vcat(iW:length(rlon),1:iE); nlon[1:(iW-1)] .+= 360
+    elseif iW > iE || (iW == iE && gridbounds[3] != gridbounds[4])
+        iWE = vcat(iW:length(rlon),1:iE); nlon[1:(iW-1)] .+= 360
     else; iWE = [iW];
     end
 
     nlon = nlon[iWE]
     nlat = rlat[iNS]
 
-    while maximum(nlon) > E; nlon .-= 360 end
-    while minimum(nlon) < W; nlon .+= 360 end
+    while maximum(nlon) > gridbounds[3]; nlon .-= 360 end
+    while minimum(nlon) < gridbounds[4]; nlon .+= 360 end
 
     return nlon,nlat,iWE,iNS
 

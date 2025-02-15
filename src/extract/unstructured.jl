@@ -1,6 +1,6 @@
 """
     extract(
-        odata :: AbstractArray{<:Real},
+        odata :: AbstractVector{<:Real},
         ggrd  :: UnstructuredGrid
     ) -> Array{<:Real}
 
@@ -11,8 +11,8 @@ Extracts data from odata, an Array that contains data of a Parent `GeoRegion`, i
 
 Arguments
 =========
-- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from
-- `ggrd` : A `RegionGrid` containing detailed information on what to extract
+- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from.
+- `ggrd` : A. `UnstructuredGrid` containing detailed information on what to extract.
 """
 function extract(
     odata :: AbstractArray{<:Real},
@@ -20,9 +20,9 @@ function extract(
 )
 
     ipnts = ggrd.ipoint; npnt = length(ipnts)
-    dims = size(odata); not2D = length(dims) > 1
+    dims = size(odata); not1D = length(dims) > 1
 
-    if not2D
+    if not1D
         ndata = zeros(npnt,dims[2:end]...)
         edims = map(x -> 1 : x, dims[2:end])
         for ipnt in 1 : npnt
@@ -41,8 +41,8 @@ end
 
 """
     extract!(
-        odata :: AbstractArray{<:Real},
-        ndata :: AbstractArray{<:Real},
+        ndata :: AbstractVector{<:Real},
+        odata :: AbstractVector{<:Real},
         ggrd  :: UnstructuredGrid
     ) -> nothing
 
@@ -55,9 +55,9 @@ This allows for iterable in-place modification to save memory space and reduce a
 
 Arguments
 =========
-- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from
-- `ndata` : An array of dimension N meant as a placeholder for the extracted data to minimize allocations
-- `ggrd` : A `RegionGrid` containing detailed information on what to extract
+- `ndata` : An array of dimension N meant as a placeholder for the extracted data to minimize allocations.
+- `odata` : An array of dimension N containing gridded data in the region we are interesting in extracting from.
+- `ggrd` : A `UnstructuredGrid` containing detailed information on what to extract.
 """
 function extract!(
     ndata :: AbstractArray{<:Real},
@@ -66,9 +66,9 @@ function extract!(
 )
 
     ipnts = ggrd.ipoint; npnt = length(ipnts)
-    dims = size(odata); not2D = length(dims) > 1
+    dims = size(odata); not1D = length(dims) > 1
 
-    if not2D
+    if not1D
         edims = map(x -> 1 : x, dims[2:end])
         for ipnt in 1 : npnt
             ndata[ipnt,edims...] = odata[ipnts[ipnt],edims...]
