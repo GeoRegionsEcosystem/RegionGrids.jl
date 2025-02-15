@@ -2,29 +2,36 @@
     RegionGrid(
         geo :: Union{RectRegion,PolyRegion},
         lon :: Union{Vector{<:Real},AbstractRange{<:Real},
-        lat :: Union{Vector{<:Real},AbstractRange{<:Real}
+        lat :: Union{Vector{<:Real},AbstractRange{<:Real};
+        rotation :: Real = geo.θ
     ) -> ggrd :: RLinearMask
 
 Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
 
 Arguments
 =========
-- `geo` : A GeoRegion of interest
-- `lon` : A vector or `AbstractRange` containing the longitude points
-- `lat` : A vector or `AbstractRange` containing the latitude points
+- `geo` : A GeoRegion of interest.
+- `lon` : A vector or `AbstractRange` containing the longitude points.
+- `lat` : A vector or `AbstractRange` containing the latitude points.
+
+Keyword Arguments
+=================
+- `rotation` : Angle (in degrees) at which to "unrotate" the gridded data about the GeoRegion centroid and project into the X-Y cartesian coordinate system (in meters).
 
 Returns
 =======
-- `ggrd` : A `RectilinearGrid`
+- `ggrd` : A `RectilinearGrid`.
 """
 RegionGrid(
-    geo::GeoRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real}
-) = RegionGrid(geo,collect(lon),collect(lat))
+    geo::GeoRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real};
+    rotation :: Real = 0
+) = RegionGrid(geo,collect(lon),collect(lat),rotation=rotation)
 
 function RegionGrid(
     geo :: GeoRegion,
     lon :: Vector{FT},
-    lat :: Vector{FT}
+    lat :: Vector{FT};
+    rotation :: Real = 0
 ) where FT <: Real
 
     @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
@@ -32,7 +39,7 @@ function RegionGrid(
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
     nlon,nlat,iWE,iNS = bound2lonlat([geo.N,geo.S,geo.E,geo.W],lon,lat)
-    Xc,Yc = centroid(geo.geometry.polygon)
+    Xc,Yc = geo.geometry.centroid
 
     mask = Array{FT,2}(undef,length(nlon),length(nlat))
     wgts = Array{FT,2}(undef,length(nlon),length(nlat))
@@ -46,7 +53,7 @@ function RegionGrid(
         if in(ipnt,geo)
             mask[ilon,ilat] = 1
             ir = haversine((nlon[ilon],nlat[ilat]),(Xc,Yc))
-            iθ = atand(nlat[ilat]-Yc, nlon[ilon]-Xc) - geo.θ
+            iθ = atand(nlat[ilat]-Yc, nlon[ilon]-Xc) - (geo.θ - rotation)
             X[ilon,ilat] = ir * cosd(iθ)
             Y[ilon,ilat] = ir * sind(iθ)
             wgts[ilon,ilat] = cosd.(nlat[ilat])
@@ -58,7 +65,7 @@ function RegionGrid(
         end
     end
 
-    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,X,Y,geo.θ)
+    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,X,Y,rotation)
 
 end
 

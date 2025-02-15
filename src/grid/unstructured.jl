@@ -1,28 +1,34 @@
 """
     RegionGrid(
         geo  :: GeoRegion,
-        pnts :: Vector{Point2{FT}}
+        pnts :: Vector{Point2{FT}};
+        rotation :: Real = geo.θ
     ) where FT <: Real -> ggrd :: VectorMask
 
 Creates a `VectorMask` type based on a vector of 
 
 Arguments
 =========
-- `geo` : A GeoRegion of interest
-- `pnts` : A `Vector` of `Float` Types, containing the longitude points
+- `geo` : A GeoRegion of interest.
+- `pnts` : A `Vector` of `Point2` Types, containing the longitude/latitude points.
+
+Keyword Arguments
+=================
+- `rotation` : Angle (in degrees) at which to "unrotate" the gridded data about the GeoRegion centroid and project into the X-Y cartesian coordinate system (in meters).
 
 Returns
 =======
-- `ggrd` : A `VectorMask`
+- `ggrd` : A `VectorMask`.
 """
 function RegionGrid(
     geo  :: GeoRegion,
-    pnts :: Vector{Point2{FT}}
+    pnts :: Vector{Point2{FT}};
+    rotation :: Real = 0
 ) where FT <: Real
 
     @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
-    Xc,Yc = centroid(geo.geometry.polygon)
+    Xc,Yc = geo.geometry.centroid
 
     npnt = length(pnts)
     lon  = zeros(npnt)
@@ -46,11 +52,11 @@ function RegionGrid(
         lat[ii] = pnts[ipnt[ii]][2]
         wgts[ii] = cosd(pnts[ipnt[ii]][2])
         ir = haversine((lon[ii],lat[ii]),(Xc,Yc))
-        iθ = atand(lat[ii]-Yc,lon[ii]-Xc) - geo.θ
+        iθ = atand(lat[ii]-Yc,lon[ii]-Xc) - (geo.θ - rotation)
         X[ii] = ir * cosd(iθ)
         Y[ii] = ir * sind(iθ)
     end
 
-    return VectorTilt{FT}(lon,lat,ipnt,wgts,X,Y,geo.θ)
+    return VectorTilt{FT}(lon,lat,ipnt,wgts,X,Y,rotation)
 
 end
