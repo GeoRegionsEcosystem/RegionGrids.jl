@@ -71,6 +71,6 @@ function RegionGrid(
         end
     end
 
-    return GeneralizedGrid{FT}(lon,lat,ilon,ilat,mask,wgts,X,Y,rotation)
+    return GeneralizedGrid{FT}(lon,lat,ilon,ilat,mask,wgts,X,Y,rotation-geo.θ)
 
 end

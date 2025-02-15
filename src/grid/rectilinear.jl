@@ -59,7 +59,7 @@ function RegionGrid(
         end
     end
 
-    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,X,Y,rotation)
+    return RectilinearGrid{FT}(nlon,nlat,iWE,iNS,mask,wgts,X,Y,rotation-geo.θ)
 
 end
 
