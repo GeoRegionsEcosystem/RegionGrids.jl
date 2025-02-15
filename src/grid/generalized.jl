@@ -61,15 +61,13 @@ function RegionGrid(
         lon[iilon,iilat] < geo.W ? lon[iilon,iilat] += 360 : nothing
         lat[iilon,iilat] = pnts[iiWE,iiSN][2]
         iipnt = pnts[iiWE,iiSN]
+        X[iilon,iilat], Y[iilon,iilat] = derotatepoint(iipnt,geo,rotation=rotation)
         if in(iipnt,geo)
             mask[iilon,iilat] = 1
             wgts[iilon,iilat] = cosd.(lat[iilon,iilat])
-            X[iilon,iilat], Y[iilon,iilat] = derotatepoint(iipnt,geo,rotation=rotation)
         else
             mask[iilon,iilat] = NaN
             wgts[iilon,iilat] = NaN
-            X[iilon,iilat] = NaN
-            Y[iilon,iilat] = NaN
         end
     end
 
