@@ -1,9 +1,9 @@
 using Documenter
 using DocumenterVitepress
 using RegionGrids
-# import CairoMakie
+import CairoMakie
 
-# CairoMakie.activate!(type = "svg")
+CairoMakie.activate!(type = "svg")
 
 DocMeta.setdocmeta!(RegionGrids, :DocTestSetup, :(using RegionGrids); recursive=true)
 
@@ -17,8 +17,10 @@ makedocs(;
         repo = "https://github.com/GeoRegionsEcosystem/RegionGrids.jl",
     ),
     pages=[
-        "Home" => "index.md",
+        "Home"            => "index.md",
         "Getting Started" => "regiongrids.md",
+        "Basic Example"   => "example.md",
+        "API List"        => "api.md",
     ],
 )
 
