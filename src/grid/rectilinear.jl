@@ -30,11 +30,12 @@ RegionGrid(
 
 function RegionGrid(
     geo :: GeoRegion,
-    lon :: Vector{FT},
-    lat :: Vector{FT};
+    lon :: Vector{<:Real},
+    lat :: Vector{<:Real};
     rotation  :: Real = 0,
-    sigdigits :: Int = 10
-) where FT <: Real
+    sigdigits :: Int = 10,
+    FT = Float64
+)
 
     @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
 
@@ -42,8 +43,8 @@ function RegionGrid(
 
     nlon,nlat,iWE,iNS = bound2lonlat([geo.N,geo.S,geo.E,geo.W],lon,lat)
 
-    mask = Array{FT,2}(undef,length(nlon),length(nlat))
-    wgts = Array{FT,2}(undef,length(nlon),length(nlat))
+    mask = ones(FT,length(nlon),length(nlat)) * NaN
+    wgts = ones(FT,length(nlon),length(nlat)) * NaN
 
     @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a TiltRegion, we need to defined a rotation as well ..."
     X = Array{FT,2}(undef,length(nlon),length(nlat))
@@ -55,9 +56,6 @@ function RegionGrid(
         if in(ipnt,geo,sigdigits=sigdigits)
             mask[ilon,ilat] = 1
             wgts[ilon,ilat] = cosd.(nlat[ilat])
-        else
-            mask[ilon,ilat] = NaN
-            wgts[ilon,ilat] = NaN
         end
     end
 

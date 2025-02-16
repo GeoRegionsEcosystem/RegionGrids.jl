@@ -23,10 +23,11 @@ Returns
 """
 function RegionGrid(
     geo  :: GeoRegion,
-    pnts :: Vector{Point2{FT}};
+    pnts :: Vector{Point2{<:Real}};
     rotation :: Real = 0,
-    sigdigits :: Int = 10
-) where FT <: Real
+    sigdigits :: Int = 10;
+    FT = Float64
+)
 
     @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
