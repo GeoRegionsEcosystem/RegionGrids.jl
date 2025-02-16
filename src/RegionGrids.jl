@@ -2,8 +2,6 @@ module RegionGrids
 
 ## Modules Used
 using Dates
-using Distances
-using GeometryOps
 using GeoRegions
 using Logging
 
