@@ -14,25 +14,22 @@ hero:
       text: Getting Started
       link: /regiongrids
     - theme: alt
-      text: Basics
-      link: /basics
+      text: Example
+      link: /example
     - theme: alt
-      text: Tutorials
-      link: /tutorials
+      text: API
+      link: /api
     - theme: alt
       text: View on Github
       link: https://github.com/GeoRegionsEcosystem/RegionGrids.jl
-      
 
 features:
-  - icon: <img width="64" height="64" src="https://img.icons8.com/arcade/64/markdown.png" alt="markdown"/>
-    title: Grids
-    details: Geographic Regions are defined using Longitude/Latitude coordinates
-    link: /basics/shape
-  - icon: <img width="64" height="64" src="https://img.icons8.com/arcade/64/markdown.png" alt="markdown"/>
-    title: Extraction
-    details: Many predefined Geographic Regions bundled from different datasets
-    link: /basics/predefined/datasets
+  - title: 🌍 Define Grids of Interest
+    details: You have a (Geo)Region of interest and some gridded data? Let's define a Grid for it.
+  - title: ⚙️ Flexible Grid Types
+    details: Maybe your data isn't rectilinear on the Lon/Lat Grid? Don't worry, we've got you covered.
+  - title: 🔍 Extraction made Easy
+    details: Already defined a Grid for your (Geo)Region of interest? Now let's Extract Some Data!
 ---
 ```
 
