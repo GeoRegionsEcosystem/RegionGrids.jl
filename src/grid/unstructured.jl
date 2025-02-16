@@ -25,7 +25,7 @@ function RegionGrid(
     geo  :: GeoRegion,
     pnts :: Vector{Point2{<:Real}};
     rotation :: Real = 0,
-    sigdigits :: Int = 10;
+    sigdigits :: Int = 10,
     FT = Float64
 )
 
