@@ -29,7 +29,7 @@ function RegionGrid(
     FT2 = Float64
 ) where FT1 <: Real
 
-    @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
+    @info "$(modulelog()) - Creating an UnstructuredGrid for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
     npnt = length(pnts)
     lon  = zeros(FT1,npnt)

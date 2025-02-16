@@ -46,7 +46,6 @@ function RegionGrid(
     mask = ones(FT2,length(nlon),length(nlat)) * NaN
     wgts = ones(FT2,length(nlon),length(nlat)) * NaN
 
-    @info "$(modulelog()) - Since the $(geo.name) GeoRegion is a TiltRegion, we need to defined a rotation as well ..."
     X = Array{FT2,2}(undef,length(nlon),length(nlat))
     Y = Array{FT2,2}(undef,length(nlon),length(nlat))
 
@@ -126,13 +125,13 @@ function bound2lonlat(
 
     nlon = deepcopy(rlon)
 
-    @info "$(modulelog()) - Creating vector of latitude indices to extract ..."
+    @debug "$(modulelog()) - Creating vector of latitude indices to extract ..."
     if     iN < iS; iNS = vcat(iN:iS)
     elseif iS < iN; iNS = vcat(iS:iN)
     else;           iNS = [iN];
     end
 
-    @info "$(modulelog()) - Creating vector of longitude indices to extract ..."
+    @debug "$(modulelog()) - Creating vector of longitude indices to extract ..."
     if     iW < iE; iWE = vcat(iW:iE)
     elseif iW > iE || (iW == iE && gridbounds[3] != gridbounds[4])
         iWE = vcat(iW:length(rlon),1:iE); nlon[1:(iW-1)] .+= 360
