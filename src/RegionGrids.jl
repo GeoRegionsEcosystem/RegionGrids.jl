@@ -92,8 +92,8 @@ struct UnstructuredGrid{FT<:Real} <: RegionGrid
         lat :: Vector{FT}
      ipoint :: Array{Int}
     weights :: Vector{FT}
-          X :: FT
-          Y :: FT
+          X :: Vector{FT}
+          Y :: Vector{FT}
           θ :: FT
 end
 

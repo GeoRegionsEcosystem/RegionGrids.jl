@@ -34,9 +34,6 @@ function RegionGrid(
     lon  = zeros(npnt)
     lat  = zeros(npnt)
     ipnt = zeros(npnt)
-    wgts = zeros(npnt)
-    X = zeros(npnt)
-    Y = zeros(npnt)
 
     for ii in 1 : npnt
         ipnt[ii] = in(pnts[ii],geo,sigdigits=sigdigits) ? ii : NaN
@@ -44,6 +41,12 @@ function RegionGrid(
 
     ipnt = ipnt[.!isnan.(ipnt)]; ipnt = Int.(ipnt)
     npnt = length(ipnt)
+
+    lon  = zeros(npnt)
+    lat  = zeros(npnt)
+    wgts = zeros(npnt)
+    X = zeros(npnt)
+    Y = zeros(npnt)
 
     for ii = 1 : npnt
         iipnt = pnts[ipnt[ii]]
