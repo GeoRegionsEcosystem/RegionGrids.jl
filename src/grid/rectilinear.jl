@@ -24,14 +24,15 @@ Returns
 """
 RegionGrid(
     geo::GeoRegion, lon::AbstractRange{<:Real}, lat::AbstractRange{<:Real};
-    rotation :: Real = 0
-) = RegionGrid(geo,collect(lon),collect(lat),rotation=rotation)
+    rotation :: Real = 0, sigdigits :: Int = 10
+) = RegionGrid(geo,collect(lon),collect(lat),rotation=rotation,sigdigits=sigdigits)
 
 function RegionGrid(
     geo :: GeoRegion,
     lon :: Vector{FT},
     lat :: Vector{FT};
-    rotation :: Real = 0
+    rotation  :: Real = 0,
+    sigdigits :: Int = 10
 ) where FT <: Real
 
     @info "$(modulelog()) - Creating a RectilinearGrid for the $(geo.name) GeoRegion"
@@ -50,7 +51,7 @@ function RegionGrid(
     for ilat in eachindex(nlat), ilon in eachindex(nlon)
         ipnt = Point2(nlon[ilon],nlat[ilat])
         X[ilon,ilat], Y[ilon,ilat] = derotatepoint(ipnt,geo,rotation=rotation)
-        if in(ipnt,geo)
+        if in(ipnt,geo,sigdigits=sigdigits)
             mask[ilon,ilat] = 1
             wgts[ilon,ilat] = cosd.(nlat[ilat])
         else

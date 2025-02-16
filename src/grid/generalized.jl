@@ -23,7 +23,8 @@ Returns
 function RegionGrid(
     geo  :: GeoRegion,
     pnts :: Array{Point2{FT}};
-    rotation :: Real = 0
+    rotation  :: Real = 0,
+    sigdigits :: Int = 10
 ) where FT <: Real
 
     @info "$(modulelog()) - Creating a GeneralizedGrid for the $(geo.name) GeoRegion"
@@ -62,7 +63,7 @@ function RegionGrid(
         lat[iilon,iilat] = pnts[iiWE,iiSN][2]
         iipnt = pnts[iiWE,iiSN]
         X[iilon,iilat], Y[iilon,iilat] = derotatepoint(iipnt,geo,rotation=rotation)
-        if in(iipnt,geo)
+        if in(iipnt,geo,sigdigits=sigdigits)
             mask[iilon,iilat] = 1
             wgts[iilon,iilat] = cosd.(lat[iilon,iilat])
         else

@@ -23,7 +23,8 @@ Returns
 function RegionGrid(
     geo  :: GeoRegion,
     pnts :: Vector{Point2{FT}};
-    rotation :: Real = 0
+    rotation :: Real = 0,
+    sigdigits :: Int = 10
 ) where FT <: Real
 
     @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
@@ -37,7 +38,7 @@ function RegionGrid(
     Y = zeros(npnt)
 
     for ii in 1 : npnt
-        if in(pnts[ii],geo); ipnt[ii] = ii; else; ipnt[ii] = NaN end
+        ipnt[ii] = in(pnts[ii],geo,sigdigits=sigdigits) ? ii : NaN
     end
 
     ipnt = ipnt[.!isnan.(ipnt)]; ipnt = Int.(ipnt)
