@@ -1,12 +1,13 @@
 """
     RegionGrid(
-        geo :: Union{RectRegion,PolyRegion},
+        geo :: GeoRegion,
         lon :: Union{Vector{<:Real},AbstractRange{<:Real},
         lat :: Union{Vector{<:Real},AbstractRange{<:Real};
-        rotation :: Real = geo.θ
-    ) -> ggrd :: RLinearMask
+        rotation  :: Real = 0,
+        sigdigits :: Int = 10
+    ) -> ggrd :: RectilinearGrid
 
-Creates a `RectGrid` or `PolyGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
+Creates a `RectilinearGrid` type based on the following arguments. This method is suitable for rectilinear grids of longitude/latitude output such as from Isca, or from satellite and reanalysis gridded datasets.
 
 Arguments
 =========

@@ -2,15 +2,16 @@
     RegionGrid(
         geo  :: GeoRegion,
         pnts :: Array{Point2{FT}};
-        rotation :: Real = geo.θ
+        rotation  :: Real = 0,
+        sigdigits :: Int = 10
     ) where FT <: Real -> ggrd :: GeneralizedGrid
 
-Creates a `GeneralTilt` type based on the following arguments. This method is more suitable for structured non-rectilinear (e.g., curvilinear) grids of longitude and latitude points, such as in the output of WRF.
+Creates a `GeneralizedGrid` type based on the following arguments. This method is more suitable for structured non-rectilinear (e.g., curvilinear) grids of longitude and latitude points, such as in the output of WRF.
 
 Arguments
 =========
 - `geo` : A GeoRegion of interest.
-- `pnts` : An array of `Point2` types containing the longitude/latitude points.
+- `pnts` : An array of `Point2(lon,lat)` types.
 
 Keyword Arguments
 =================
@@ -18,7 +19,7 @@ Keyword Arguments
 
 Returns
 =======
-- `ggrd` : A `GeneralTilt`.
+- `ggrd` : A `GeneralizedGrid`.
 """
 function RegionGrid(
     geo  :: GeoRegion,

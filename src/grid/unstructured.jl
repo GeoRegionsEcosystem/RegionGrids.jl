@@ -2,15 +2,16 @@
     RegionGrid(
         geo  :: GeoRegion,
         pnts :: Vector{Point2{FT}};
-        rotation :: Real = geo.θ
-    ) where FT <: Real -> ggrd :: VectorMask
+        rotation  :: Real = 0,
+        sigdigits :: Int = 10
+    ) where FT <: Real -> ggrd :: UnstructuredGrid
 
-Creates a `VectorMask` type based on a vector of 
+Creates a `UnstructuredGrid` type. This method is more suitable for unstructured grids and mesh grid of longitude and latitude points, such as in the output of CESM2 when it is run in the cubed-sphere configuration.
 
 Arguments
 =========
 - `geo` : A GeoRegion of interest.
-- `pnts` : A `Vector` of `Point2` Types, containing the longitude/latitude points.
+- `pnts` : A `Vector` of `Point2(lon,lat)` types.
 
 Keyword Arguments
 =================
@@ -18,7 +19,7 @@ Keyword Arguments
 
 Returns
 =======
-- `ggrd` : A `VectorMask`.
+- `ggrd` : A `UnstructuredGrid`.
 """
 function RegionGrid(
     geo  :: GeoRegion,
