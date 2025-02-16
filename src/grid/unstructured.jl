@@ -54,6 +54,6 @@ function RegionGrid(
         X[ii],Y[ii] = derotatepoint(iipnt,geo,rotation=rotation)
     end
 
-    return VectorTilt{FT}(lon,lat,ipnt,wgts,X,Y,rotation-geo.θ)
+    return UnstructuredGrid{FT}(lon,lat,ipnt,wgts,X,Y,rotation-geo.θ)
 
 end
