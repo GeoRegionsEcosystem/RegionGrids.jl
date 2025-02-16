@@ -28,10 +28,15 @@ geo = GeoRegion([10,100,-50,10],[20,10,0,20])
 slon,slat = coordinates(geo) # extract the coordinates
 ```
 
-Following which, we can extract the data within this GeoRegion as follows:
+Following which, we can define a RegionGrid:
 
 ```@example example
 ggrd = RegionGrid(geo,lon,lat)
+```
+
+And then use this RegionGrid to extract data for the GeoRegion of interest:
+
+```@example example
 ndata = extract(data,ggrd)
 ```
 
