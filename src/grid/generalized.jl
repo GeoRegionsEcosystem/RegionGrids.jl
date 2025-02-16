@@ -23,11 +23,11 @@ Returns
 """
 function RegionGrid(
     geo  :: GeoRegion,
-    pnts :: Array{Point2{<:Real}};
+    pnts :: Array{Point2{FT1}};
     rotation  :: Real = 0,
     sigdigits :: Int = 10,
-    FT = Float64
-)
+    FT2 = Float64
+) where FT1 <: Real
 
     @info "$(modulelog()) - Creating a GeneralizedGrid for the $(geo.name) GeoRegion"
 
@@ -47,14 +47,14 @@ function RegionGrid(
     iWE = iW:iE; nlon = length(iWE)
     iSN = iS:iN; nlat = length(iSN)
 
-    lon  = zeros(nlon,nlat)
-    lat  = zeros(nlon,nlat)
-    ilon = zeros(nlon,nlat)
-    ilat = zeros(nlon,nlat)
-    mask = zeros(nlon,nlat) * NaN
-    wgts = zeros(nlon,nlat) * NaN
-    X = zeros(nlon,nlat)
-    Y = zeros(nlon,nlat)
+    lon  = zeros(FT1,nlon,nlat)
+    lat  = zeros(FT1,nlon,nlat)
+    ilon = zeros(Int,nlon,nlat)
+    ilat = zeros(Int,nlon,nlat)
+    mask = zeros(FT2,nlon,nlat) * NaN
+    wgts = zeros(FT2,nlon,nlat) * NaN
+    X    = zeros(FT2,nlon,nlat)
+    Y    = zeros(FT2,nlon,nlat)
 
     for iilat = 1 : nlat, iilon = 1 : nlon
         iiWE = iWE[iilon]; ilon[iilon,iilat] = iiWE
@@ -71,6 +71,6 @@ function RegionGrid(
         end
     end
 
-    return GeneralizedGrid{FT}(lon,lat,ilon,ilat,mask,wgts,X,Y,rotation-geo.θ)
+    return GeneralizedGrid{FT1,FT2}(lon,lat,ilon,ilat,mask,wgts,X,Y,rotation-geo.θ)
 
 end

@@ -23,31 +23,31 @@ Returns
 """
 function RegionGrid(
     geo  :: GeoRegion,
-    pnts :: Vector{Point2{<:Real}};
+    pnts :: Vector{Point2{FT1}};
     rotation :: Real = 0,
     sigdigits :: Int = 10,
-    FT = Float64
-)
+    FT2 = Float64
+) where FT1 <: Real
 
     @info "$(modulelog()) - Creating a RegionMask for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
     npnt = length(pnts)
-    lon  = zeros(npnt)
-    lat  = zeros(npnt)
-    ipnt = zeros(npnt)
+    lon  = zeros(FT1,npnt)
+    lat  = zeros(FT1,npnt)
+    ipnt = zeros(Int,npnt)
 
     for ii in 1 : npnt
-        ipnt[ii] = in(pnts[ii],geo,sigdigits=sigdigits) ? ii : NaN
+        ipnt[ii] = in(pnts[ii],geo,sigdigits=sigdigits) ? ii : 0
     end
 
-    ipnt = ipnt[.!isnan.(ipnt)]; ipnt = Int.(ipnt)
+    ipnt = ipnt[.!iszero.(ipnt)]; ipnt = Int.(ipnt)
     npnt = length(ipnt)
 
-    lon  = zeros(npnt)
-    lat  = zeros(npnt)
-    wgts = zeros(npnt)
-    X = zeros(npnt)
-    Y = zeros(npnt)
+    lon  = zeros(FT1,npnt)
+    lat  = zeros(FT1,npnt)
+    wgts = zeros(FT2,npnt)
+    X    = zeros(FT2,npnt)
+    Y    = zeros(FT2,npnt)
 
     for ii = 1 : npnt
         iipnt = pnts[ipnt[ii]]
@@ -59,6 +59,6 @@ function RegionGrid(
         X[ii],Y[ii] = derotatepoint(iipnt,geo,rotation=rotation)
     end
 
-    return UnstructuredGrid{FT}(lon,lat,ipnt,wgts,X,Y,rotation-geo.θ)
+    return UnstructuredGrid{FT1,FT2}(lon,lat,ipnt,wgts,X,Y,rotation-geo.θ)
 
 end

@@ -41,16 +41,16 @@ All `RectilinearGrid` types contain the following fields:
 * `ilat` - A Vector of `Int`s, defining the indices used to extract the latitude vector from the input latitude vector.
 * `mask` - An Array of NaNs and 1s, defining the gridpoints in the RegionGrid where the data is valid.
 """
-struct RectilinearGrid{FT<:Real} <: RegionGrid
-        lon :: Vector{FT}
-        lat :: Vector{FT}
+struct RectilinearGrid{FT1<:Real,FT2<:Real} <: RegionGrid
+        lon :: Vector{FT1}
+        lat :: Vector{FT1}
        ilon :: Vector{Int}
        ilat :: Vector{Int}
-       mask :: Array{FT,2}
-    weights :: Array{FT,2}
-          X :: Array{FT,2}
-          Y :: Array{FT,2}
-          θ :: FT
+       mask :: Array{FT2,2}
+    weights :: Array{FT2,2}
+          X :: Array{FT2,2}
+          Y :: Array{FT2,2}
+          θ :: FT2
 end
 
 """
@@ -65,16 +65,16 @@ All `GeneralizedGrid` type will contain the following fields:
 * `ilat` - A Vector of `Int`s, defining the indices used to extract the latitude vector from the input latitude vector.
 * `mask` - An Array of NaNs and 1s, defining the gridpoints in the RegionGrid where the data is valid.
 """
-struct GeneralizedGrid{FT<:Real} <: RegionGrid
-        lon :: Array{FT,2}
-        lat :: Array{FT,2}
+struct GeneralizedGrid{FT1<:Real,FT2<:Real} <: RegionGrid
+        lon :: Array{FT1,2}
+        lat :: Array{FT1,2}
        ilon :: Array{Int}
        ilat :: Array{Int}
-       mask :: Array{FT,2}
-    weights :: Array{FT,2}
-          X :: Array{FT,2}
-          Y :: Array{FT,2}
-          θ :: FT
+       mask :: Array{FT2,2}
+    weights :: Array{FT2,2}
+          X :: Array{FT2,2}
+          Y :: Array{FT2,2}
+          θ :: FT2
 end
 
 """
@@ -87,14 +87,14 @@ All `UnstructuredGrid` type will contain the following fields:
 * `lat` - A vector of `Float`s, defining the latitude for each point in the RegionGrid that describe the region.
 * `ipoint` - A Vector of `Int`s, defining the indices of the valid points from the original unstructured grid that were extracted into the RegionGrid.
 """
-struct UnstructuredGrid{FT<:Real} <: RegionGrid
-        lon :: Vector{FT}
-        lat :: Vector{FT}
+struct UnstructuredGrid{FT1<:Real,FT2<:Real} <: RegionGrid
+        lon :: Vector{FT1}
+        lat :: Vector{FT1}
      ipoint :: Array{Int}
-    weights :: Vector{FT}
-          X :: Vector{FT}
-          Y :: Vector{FT}
-          θ :: FT
+    weights :: Vector{FT2}
+          X :: Vector{FT2}
+          Y :: Vector{FT2}
+          θ :: FT2
 end
 
 modulelog() = "$(now()) - RegionGrids.jl"
