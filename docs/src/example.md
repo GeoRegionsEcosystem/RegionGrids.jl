@@ -16,15 +16,15 @@ nothing
 Let us define some random data:
 
 ```@example example
-lon = collect(0:0.5:360);  nlon = length(lon)
-lat = collect(-90:0.5:90); nlat = length(lat)
+lon = collect(0:5:360);  nlon = length(lon)
+lat = collect(-90:5:90); nlat = length(lat)
 data = rand(nlon,nlat)
 ```
 
 Next, we proceed to define a GeoRegion and extract its coordinates:
 
 ```@example example
-geo = GeoRegion([10,100,-50,10],[20,10,0,20])
+geo = GeoRegion([10,230,-50,10],[50,10,-40,50])
 slon,slat = coordinates(geo) # extract the coordinates
 ```
 
@@ -46,18 +46,21 @@ And we can visualize this by plotting the data
 fig = Figure()
 
 ax1 = Axis(
-    fig[1,1],width=750,height=375,
+    fig[1,1],width=400,height=200,
     limits=(0,360,-90,90)
 )
-contourf!(ax1,lon,lat,data,levels=range(-1,1,length=11))
+heatmap!(ax1,lon,lat,data,colorrange=(-1,1))
 lines!(ax1,slon,slat,color=:black,linewidth=5)
+lines!(ax1,slon.+360,slat,color=:black,linewidth=5)
 
 ax2 = Axis(
-    fig[2,1],width=750,height=375,
+    fig[2,1],width=400,height=200,
     limits=(0,360,-90,90)
 )
-contourf!(ax2,ggrd.lon,ggrd.lat,ndata,levels=range(-1,1,length=11))
-lines!(ax1,slon,slat,color=:black,linewidth=5)
+heatmap!(ax2,ggrd.lon,ggrd.lat,ndata,colorrange=(-1,1))
+heatmap!(ax2,ggrd.lon.+360,ggrd.lat,ndata,colorrange=(-1,1))
+lines!(ax2,slon,slat,color=:black,linewidth=5)
+lines!(ax2,slon.+360,slat,color=:black,linewidth=5)
 
 resize_to_layout!(fig)
 fig
