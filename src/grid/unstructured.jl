@@ -31,6 +31,8 @@ function RegionGrid(
 
     @info "$(modulelog()) - Creating an UnstructuredGrid for the $(geo.name) GeoRegion based on an array of longitude and latitude points"
 
+    flush(stderr)
+
     npnt = length(pnts)
     lon  = zeros(FT1,npnt)
     lat  = zeros(FT1,npnt)

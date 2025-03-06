@@ -33,6 +33,8 @@ function RegionGrid(
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
+    flush(stderr)
+
     nlon,nlat = size(pnts)
     iW = nlon; iE = 1
     iS = nlat; iN = 1

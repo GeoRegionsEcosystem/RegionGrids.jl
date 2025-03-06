@@ -41,6 +41,8 @@ function RegionGrid(
 
     @debug "$(modulelog()) - Determining indices of longitude and latitude boundaries in the given dataset ..."
 
+    flush(stderr)
+
     nlon,nlat,iWE,iNS = bound2lonlat([geo.N,geo.S,geo.E,geo.W],lon,lat)
 
     mask = ones(FT2,length(nlon),length(nlat)) * NaN
