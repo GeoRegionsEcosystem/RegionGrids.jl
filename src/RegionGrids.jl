@@ -65,6 +65,7 @@ All `GeneralizedGrid` type will contain the following fields:
 * `Y` - A Matrix of `Float`s, defining the Y-coordinates (in meters) of each point in the "derotated" RegionGrid about the centroid for the shape of the GeoRegion.
 * `θ` - A `Float` storing the information on the angle (in degrees) about which the data was rotated in the anti-clockwise direction. Mathematically, it is `rotation - geo.θ`.
 """
+struct GeneralizedGrid{FT1<:Real,FT2<:Real} <: RegionGrid
         lon :: Array{FT1,2}
         lat :: Array{FT1,2}
        ilon :: Array{Int,2}
