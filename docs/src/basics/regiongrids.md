@@ -5,6 +5,10 @@ A `RegionGrid` contains information that:
 * Subset the relevant longitude/latitude vectors from the initial grid.
 * Allows for easy spatial-averaging of extracted gridded lon-lat data, weighted by latitude.
 
+```@docs
+RegionGrid
+```
+
 ## The Types of `RegionGrid`s
 
 The `RegionGrid` abstract type has three subtypes:
