@@ -16,13 +16,16 @@ makedocs(;
     format   = DocumenterVitepress.MarkdownVitepress(
         repo = "https://github.com/GeoRegionsEcosystem/RegionGrids.jl",
     ),
-    pages=[
-        "Home"            => "index.md",
-        "Getting Started" => [
+    pages    = [
+        "Home"                 => "index.md",
+        "Getting Started"      => [
             "What is a RegionGrid?" => "basics/regiongrids.md",
             "Basic Example"         => "basics/example.md",
         ],
-        "API List"        => "api.md",
+        "Types of RegionGrids" => [
+            "Rectilinear Grids" => "types/rectilinear.md",
+        ],
+        "API List"             => "api.md",
     ],
 )
 

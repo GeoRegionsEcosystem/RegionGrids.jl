@@ -4,7 +4,7 @@
 
 In practice, we would use GeoRegions and RegionGrids as follows:
 
-```@julia
+```
 using GeoRegions
 using RegionGrids
 
