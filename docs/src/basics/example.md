@@ -1,4 +1,38 @@
-# An Example of how to use RegionGrids
+# How do you use RegionGrids.jl?
+
+## The Basic Outline
+
+In practice, we would use GeoRegions and RegionGrids as follows:
+
+```@julia
+using GeoRegions
+using RegionGrids
+
+# 1. Get gridded data, and longitude/latitude
+
+data = ...
+dlon = ... # longitudes for gridded data points
+dlat = ... # latitudes for gridded data points
+
+# 2. Define a Geographic Region using a shape defined by vectors for longitude and latitude respectively
+
+geo = GeoRegion(lon,lat)
+
+# 3. Create a RegionGrid for data extraction using the GeoRegion, and longitude and latitude vectors
+
+ggrd = RegionGrid(geo,dlon,dlat)
+
+# 4. Extract the data within the GeoRegion of interest
+
+longitude and latitude vectors respectively
+ndata  = extract(data,ggrd)
+newlon = ggrd.lon
+newlat = ggrd.lat
+```
+
+## An Example
+
+### Setup
 
 ```@example example
 using GeoRegions
@@ -13,7 +47,7 @@ clat  = coast[:,2]
 nothing
 ```
 
-Let us define some random data:
+### Defining some data
 
 ```@example example
 lon = collect(0:5:360);  nlon = length(lon)
@@ -21,12 +55,16 @@ lat = collect(-90:5:90); nlat = length(lat)
 data = rand(nlon,nlat)
 ```
 
+### Defining a Region of Interest
+
 Next, we proceed to define a GeoRegion and extract its coordinates:
 
 ```@example example
 geo = GeoRegion([10,230,-50,10],[50,10,-40,50])
 slon,slat = coordinates(geo) # extract the coordinates
 ```
+
+### Let us create a RegionGrid for Data Extraction
 
 Following which, we can define a RegionGrid:
 
@@ -40,7 +78,7 @@ And then use this RegionGrid to extract data for the GeoRegion of interest:
 ndata = extract(data,ggrd)
 ```
 
-And we can visualize this by plotting the data
+### Data Visualization
 
 ```@example example
 fig = Figure()

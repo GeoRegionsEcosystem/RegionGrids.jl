@@ -14,4 +14,4 @@ The `RegionGrid` abstract type has three subtypes:
 
 ![Types of RegionGrids](typesofgrids.png)
 
-Confusing? Fret not, it's always easier to understand by doing, so let's go through an example [here](example).
+Confusing? Fret not, it's always easier to understand by doing, so let's go through an example [here](/basics/example).

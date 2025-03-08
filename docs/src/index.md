@@ -12,10 +12,10 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /regiongrids
+      link: /basics/regiongrids
     - theme: alt
       text: Example
-      link: /example
+      link: /basics/example
     - theme: alt
       text: API
       link: /api

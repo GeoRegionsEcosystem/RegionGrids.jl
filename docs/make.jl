@@ -18,8 +18,10 @@ makedocs(;
     ),
     pages=[
         "Home"            => "index.md",
-        "Getting Started" => "regiongrids.md",
-        "Basic Example"   => "example.md",
+        "Getting Started" => [
+            "What is a RegionGrid?" => "basics/regiongrids.md",
+            "Basic Example"         => "basics/example.md",
+        ],
         "API List"        => "api.md",
     ],
 )
