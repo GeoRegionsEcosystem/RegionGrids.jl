@@ -43,7 +43,7 @@ RectilinearGrid
 
 We see that in a `RectilinearGrid` type, we have the `lon` and `lat` fields that defined the longitude and latitude vectors that have been cropped to fit the GeoRegion bounds.
 
-```@example
+```@example rectilinear
 ggrd.lon, ggrd.lat
 ```
 
