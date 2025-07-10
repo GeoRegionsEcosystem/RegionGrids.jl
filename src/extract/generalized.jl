@@ -15,23 +15,23 @@ Arguments
 - `ggrd` : A `RegionGrid` containing detailed information on what to extract.
 """
 function extract(
-    odata :: AbstractArray{<:Real},
+    odata :: AbstractArray{FT},
     ggrd  :: GeneralizedGrid
-)
+) where FT <: Real
 
     ilon = ggrd.ilon; ilat = ggrd.ilat
     nlon,nlat = size(ggrd.ilon)
     dims = size(odata); not2D = length(dims) > 2
 
     if not2D
-        ndata = zeros(nlon,nlat,dims[3:end]...)
+        ndata = zeros(FT,nlon,nlat,dims[3:end]...)
         edims = map(x -> 1 : x, dims[3:end])
         for glat in 1 : nlat, glon in 1 : nlon
             ndata[glon,glat,edims...] = 
             odata[ilon[glon,glat],ilat[glon,glat],edims...] * ggrd.mask[glon,glat]
         end
     else
-        ndata = zeros(nlon,nlat)
+        ndata = zeros(FT,nlon,nlat)
         for glat in 1 : nlat, glon in 1 : nlon
             ndata[glon,glat] = 
             odata[ilon[glon,glat],ilat[glon,glat]] * ggrd.mask[glon,glat]

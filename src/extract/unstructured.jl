@@ -15,21 +15,21 @@ Arguments
 - `ggrd` : A. `UnstructuredGrid` containing detailed information on what to extract.
 """
 function extract(
-    odata :: AbstractArray{<:Real},
+    odata :: AbstractArray{FT},
     ggrd  :: UnstructuredGrid
-)
+) where FT <: Real
 
     ipnts = ggrd.ipoint; npnt = length(ipnts)
     dims = size(odata); not1D = length(dims) > 1
 
     if not1D
-        ndata = zeros(npnt,dims[2:end]...)
+        ndata = zeros(FT,npnt,dims[2:end]...)
         edims = map(x -> 1 : x, dims[2:end])
         for ipnt in 1 : npnt
             ndata[ipnt,edims...] = odata[ipnts[ipnt],edims...]
         end
     else
-        ndata = zeros(npnt)
+        ndata = zeros(FT,npnt)
         for ipnt in 1 : npnt
             ndata[ipnt] = odata[ipnts[ipnt]]
         end
