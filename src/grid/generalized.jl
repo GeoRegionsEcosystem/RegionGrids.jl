@@ -23,7 +23,7 @@ Returns
 """
 function RegionGrid(
     geo  :: GeoRegion,
-    pnts :: Array{Point2{FT1}};
+    pnts :: Matrix{Point2{FT1}};
     rotation  :: Real = 0,
     sigdigits :: Int = 10,
     FT2 = Float64
