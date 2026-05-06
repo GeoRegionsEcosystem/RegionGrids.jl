@@ -68,8 +68,8 @@ function extract!(
     ggrd  :: GeneralizedGrid
 )
 
-    ilon = ggrd.ilon; nlon = length(ggrd.ilon)
-    ilat = ggrd.ilat; nlat = length(ggrd.ilat)
+    ilon = ggrd.ilon; ilat = ggrd.ilat
+    nlon,nlat = size(ggrd.ilon)
     dims = size(odata); not2D = length(dims) > 2
 
     if not2D
