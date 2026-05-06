@@ -42,10 +42,10 @@ struct RectilinearGrid{FT1<:Real,FT2<:Real} <: RegionGrid
         lat :: Vector{FT1}
        ilon :: Vector{Int}
        ilat :: Vector{Int}
-       mask :: Array{FT2,2}
-    weights :: Array{FT2,2}
-          X :: Array{FT2,2}
-          Y :: Array{FT2,2}
+       mask :: Matrix{FT2}
+    weights :: Matrix{FT2}
+          X :: Matrix{FT2}
+          Y :: Matrix{FT2}
           θ :: FT2
 end
 
@@ -66,14 +66,14 @@ All `GeneralizedGrid` type will contain the following fields:
 * `θ` - A `Float` storing the information on the angle (in degrees) about which the data was rotated in the anti-clockwise direction. Mathematically, it is `rotation - geo.θ`.
 """
 struct GeneralizedGrid{FT1<:Real,FT2<:Real} <: RegionGrid
-        lon :: Array{FT1,2}
-        lat :: Array{FT1,2}
-       ilon :: Array{Int,2}
-       ilat :: Array{Int,2}
-       mask :: Array{FT2,2}
-    weights :: Array{FT2,2}
-          X :: Array{FT2,2}
-          Y :: Array{FT2,2}
+        lon :: Matrix{FT1}
+        lat :: Matrix{FT1}
+       ilon :: Matrix{Int}
+       ilat :: Matrix{Int}
+       mask :: Matrix{FT2}
+    weights :: Matrix{FT2}
+          X :: Matrix{FT2}
+          Y :: Matrix{FT2}
           θ :: FT2
 end
 
