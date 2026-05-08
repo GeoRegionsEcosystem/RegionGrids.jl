@@ -38,3 +38,99 @@ function nearest(
     end
 
 end
+
+"""
+    nearest(
+        fgrd :: RegionGrid,
+        cgrd :: RegionGrid
+    ) -> Array{Int}
+
+For each point on a high-resolution RegionGrid `fgrd`, find the index of the closest grid-point on a lower-resolution RegionGrid `cgrd`.
+
+Arguments
+=========
+- `fgrd` : A `RegionGrid` containing the high-resolution grid points.
+- `cgrd` : A `RegionGrid` containing the lower-resolution grid points.
+"""
+function nearest(
+    ggrdf :: RectilinearGrid,
+    ggrdc :: RegionGrid
+)
+
+    lonc = ggrdc.lon[:]
+    latc = ggrdc.lat[:]
+
+    xc = cosd.(lonc) .* cosd.(latc)
+    yc = sind.(lonc) .* cosd.(latc)
+    zc = sind.(latc)
+
+    lonf = ggrdf.lon; nlon = length(lonf)
+    latf = ggrdf.lat; nlat = length(latf)
+
+    imat = zeros(Int,nlon,nlat)
+    for ilat = 1 : nlat, ilon = 1 : nlon
+        ix = cosd.(lonf[ilon]) .* cosd.(latf[ilat])
+        iy = sind.(lonf[ilon]) .* cosd.(latf[ilat])
+        iz = sind.(latf[ilat])
+        imat[ilon,ilat] = argmin(abs.((xc.-ix).^2 .+ (yc.-iy).^2 .+ (zc.-iz).^2))
+    end
+
+    return imat
+
+end
+
+function nearest(
+    ggrdf :: GeneralizedGrid,
+    ggrdc :: RegionGrid
+)
+
+    lonc = ggrdc.lon[:]
+    latc = ggrdc.lat[:]
+
+    xc = cosd.(lonc) .* cosd.(latc)
+    yc = sind.(lonc) .* cosd.(latc)
+    zc = sind.(latc)
+
+    lonf = ggrdf.lon
+    latf = ggrdf.lat
+    nlon,nlat = size(lonf)
+
+    imat = zeros(Int,nlon,nlat)
+    for ilat = 1 : nlat, ilon = 1 : nlon
+        ix = cosd.(lonf[ilon,ilat]) .* cosd.(latf[ilon,ilat])
+        iy = sind.(lonf[ilon,ilat]) .* cosd.(latf[ilon,ilat])
+        iz = sind.(latf[ilon,ilat])
+        imat[ilon,ilat] = argmin(abs.((xc.-ix).^2 .+ (yc.-iy).^2 .+ (zc.-iz).^2))
+    end
+
+    return imat
+
+end
+
+function nearest(
+    ggrdf :: UnstructuredGrid,
+    ggrdc :: RegionGrid
+)
+
+    lonc = ggrdc.lon[:]
+    latc = ggrdc.lat[:]
+
+    xc = cosd.(lonc) .* cosd.(latc)
+    yc = sind.(lonc) .* cosd.(latc)
+    zc = sind.(latc)
+
+    lonf = ggrdf.lon
+    latf = ggrdf.lat
+    npnt = length(lonf)
+
+    imat = zeros(Int,npnt)
+    for ipnt = 1 : npnt
+        ix = cosd.(lonf[ipnt]) .* cosd.(latf[ipnt])
+        iy = sind.(lonf[ipnt]) .* cosd.(latf[ipnt])
+        iz = sind.(latf[ipnt])
+        imat[ipnt] = argmin(abs.((xc.-ix).^2 .+ (yc.-iy).^2 .+ (zc.-iz).^2))
+    end
+
+    return imat
+
+end
