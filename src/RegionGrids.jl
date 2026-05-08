@@ -112,6 +112,8 @@ include("extract/rectilinear.jl")
 include("extract/generalized.jl")
 include("extract/unstructured.jl")
 
+include("nearest.jl")
+
 include("show.jl")
 
 end # module

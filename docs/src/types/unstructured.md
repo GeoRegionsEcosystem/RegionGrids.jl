@@ -46,13 +46,13 @@ The API for creating a Unstructured Grid can be found [here]()
 UnstructuredGrid
 ```
 
-We see that in a `UnstructuredGrid` type, we have the `lon` and `lat` vectors that defined the longitude and latitude points that are within the GeoRegion.
+We see that in a `UnstructuredGrid` type, we have the `lon` and `lat` vectors that defined the perturbed longitude and latitude points that are within the GeoRegion.
 
 ```@example unstructured
-ggrd.lon
+pggrd.lon
 ```
 ```@example unstructured
-ggrd.lat
+pggrd.lat
 ```
 
 ## An example of using Unstructured Grids
