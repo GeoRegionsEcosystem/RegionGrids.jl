@@ -21,6 +21,7 @@ makedocs(;
         "Getting Started"      => [
             "What is a RegionGrid?" => "basics/regiongrids.md",
             "Basic Example"         => "basics/example.md",
+            "Other Features"        => "basics/features.md",
         ],
         "Types of RegionGrids" => [
             "Rectilinear Grids"  => "types/rectilinear.md",
