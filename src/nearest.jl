@@ -27,9 +27,9 @@ function nearest(
     pz = sind.(plat)
 
     if isone(n)
-        return argmin(abs.((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2))
+        return argmin((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2)
     else
-        return findall(≤(n),sortperm(abs.((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2)))
+        return findall(≤(n),sortperm((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2))
     end
 
 end
@@ -52,7 +52,7 @@ function nearest(
     ggrdc :: RegionGrid
 )
 
-    xc,yc,zc = coarsegrid(ggrdc)
+    xc,yc,zc = coarsegrid(ggrdc); nc = length(xc); dc = zeros(nc)
 
     lonf = ggrdf.lon; nlon = length(lonf)
     latf = ggrdf.lat; nlat = length(latf)
@@ -62,7 +62,10 @@ function nearest(
         ix = cosd.(lonf[ilon]) .* cosd.(latf[ilat])
         iy = sind.(lonf[ilon]) .* cosd.(latf[ilat])
         iz = sind.(latf[ilat])
-        imat[ilon,ilat] = argmin(abs.((xc.-ix).^2 .+ (yc.-iy).^2 .+ (zc.-iz).^2))
+        for ic = 1 : nc
+            dc[ic] = (xc[ic] - ix)^2 + (yc[ic] - iy)^2 + (zc[ic] - iz)^2
+        end
+        imat[ilon,ilat] = argmin(dc)
     end
 
     return imat
@@ -74,7 +77,7 @@ function nearest(
     ggrdc :: RegionGrid
 )
 
-    xc,yc,zc = coarsegrid(ggrdc)
+    xc,yc,zc = coarsegrid(ggrdc); nc = length(xc); dc = zeros(nc)
 
     lonf = ggrdf.lon
     latf = ggrdf.lat
@@ -85,7 +88,10 @@ function nearest(
         ix = cosd.(lonf[ilon,ilat]) .* cosd.(latf[ilon,ilat])
         iy = sind.(lonf[ilon,ilat]) .* cosd.(latf[ilon,ilat])
         iz = sind.(latf[ilon,ilat])
-        imat[ilon,ilat] = argmin(abs.((xc.-ix).^2 .+ (yc.-iy).^2 .+ (zc.-iz).^2))
+        for ic = 1 : nc
+            dc[ic] = (xc[ic] - ix)^2 + (yc[ic] - iy)^2 + (zc[ic] - iz)^2
+        end
+        imat[ilon,ilat] = argmin(dc)
     end
 
     return imat
@@ -97,7 +103,7 @@ function nearest(
     ggrdc :: RegionGrid
 )
 
-    xc,yc,zc = coarsegrid(ggrdc)
+    xc,yc,zc = coarsegrid(ggrdc); nc = length(xc); dc = zeros(nc)
 
     lonf = ggrdf.lon
     latf = ggrdf.lat
@@ -108,7 +114,10 @@ function nearest(
         ix = cosd.(lonf[ipnt]) .* cosd.(latf[ipnt])
         iy = sind.(lonf[ipnt]) .* cosd.(latf[ipnt])
         iz = sind.(latf[ipnt])
-        imat[ipnt] = argmin(abs.((xc.-ix).^2 .+ (yc.-iy).^2 .+ (zc.-iz).^2))
+        for ic = 1 : nc
+            dc[ic] = (xc[ic] - ix)^2 + (yc[ic] - iy)^2 + (zc[ic] - iz)^2
+        end
+        imat[ipnt] = argmin(dc)
     end
 
     return imat
