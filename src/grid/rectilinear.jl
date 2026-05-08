@@ -140,6 +140,8 @@ function bound2lonlat(
     else; iWE = [iW];
     end
 
+    flush(stderr)
+
     nlon = nlon[iWE]
     nlat = rlat[iNS]
 
