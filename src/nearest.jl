@@ -29,7 +29,7 @@ function nearest(
     if isone(n)
         return argmin((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2)
     else
-        return findall(≤(n),sortperm((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2))
+        return sortperm((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2)[1:n]
     end
 
 end
@@ -59,9 +59,9 @@ function nearest(
 
     imat = zeros(Int,nlon,nlat)
     for ilat = 1 : nlat, ilon = 1 : nlon
-        ix = cosd.(lonf[ilon]) .* cosd.(latf[ilat])
-        iy = sind.(lonf[ilon]) .* cosd.(latf[ilat])
-        iz = sind.(latf[ilat])
+        ix = cosd(lonf[ilon]) * cosd(latf[ilat])
+        iy = sind(lonf[ilon]) * cosd(latf[ilat])
+        iz = sind(latf[ilat])
         for ic = 1 : nc
             dc[ic] = (xc[ic] - ix)^2 + (yc[ic] - iy)^2 + (zc[ic] - iz)^2
         end
@@ -85,9 +85,9 @@ function nearest(
 
     imat = zeros(Int,nlon,nlat)
     for ilat = 1 : nlat, ilon = 1 : nlon
-        ix = cosd.(lonf[ilon,ilat]) .* cosd.(latf[ilon,ilat])
-        iy = sind.(lonf[ilon,ilat]) .* cosd.(latf[ilon,ilat])
-        iz = sind.(latf[ilon,ilat])
+        ix = cosd(lonf[ilon,ilat]) * cosd(latf[ilon,ilat])
+        iy = sind(lonf[ilon,ilat]) * cosd(latf[ilon,ilat])
+        iz = sind(latf[ilon,ilat])
         for ic = 1 : nc
             dc[ic] = (xc[ic] - ix)^2 + (yc[ic] - iy)^2 + (zc[ic] - iz)^2
         end
@@ -111,9 +111,9 @@ function nearest(
 
     imat = zeros(Int,npnt)
     for ipnt = 1 : npnt
-        ix = cosd.(lonf[ipnt]) .* cosd.(latf[ipnt])
-        iy = sind.(lonf[ipnt]) .* cosd.(latf[ipnt])
-        iz = sind.(latf[ipnt])
+        ix = cosd(lonf[ipnt]) * cosd(latf[ipnt])
+        iy = sind(lonf[ipnt]) * cosd(latf[ipnt])
+        iz = sind(latf[ipnt])
         for ic = 1 : nc
             dc[ic] = (xc[ic] - ix)^2 + (yc[ic] - iy)^2 + (zc[ic] - iz)^2
         end
@@ -136,9 +136,9 @@ function coarsegrid(
     zc = zeros(nlon,nlat)
 
     for ilat = 1 : nlat, ilon = 1 : nlon
-        xc[ilon,ilat] = cosd.(lon[ilon]) * cosd.(lat[ilat])
-        yc[ilon,ilat] = sind.(lon[ilon]) * cosd.(lat[ilat])
-        zc[ilon,ilat] = sind.(lat[ilat])
+        xc[ilon,ilat] = cosd(lon[ilon]) * cosd(lat[ilat])
+        yc[ilon,ilat] = sind(lon[ilon]) * cosd(lat[ilat])
+        zc[ilon,ilat] = sind(lat[ilat])
     end
 
     return xc[:], yc[:], zc[:]
