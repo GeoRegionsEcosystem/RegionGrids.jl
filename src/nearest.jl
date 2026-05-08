@@ -19,12 +19,7 @@ function nearest(
     n    :: Int = 1
 )
 
-    glon = ggrd.lon[:]
-    glat = ggrd.lat[:]
-
-    gx = cosd.(glon) .* cosd.(glat)
-    gy = sind.(glon) .* cosd.(glat)
-    gz = sind.(glat)
+    gx,gy,gz = coarsegrid(ggrd)
 
     plon,plat = pnt[1],pnt[2]
     px = cosd.(plon) * cosd.(plat)
@@ -57,12 +52,7 @@ function nearest(
     ggrdc :: RegionGrid
 )
 
-    lonc = ggrdc.lon[:]
-    latc = ggrdc.lat[:]
-
-    xc = cosd.(lonc) .* cosd.(latc)
-    yc = sind.(lonc) .* cosd.(latc)
-    zc = sind.(latc)
+    xc,yc,zc = coarsegrid(ggrdc)
 
     lonf = ggrdf.lon; nlon = length(lonf)
     latf = ggrdf.lat; nlat = length(latf)
@@ -84,12 +74,7 @@ function nearest(
     ggrdc :: RegionGrid
 )
 
-    lonc = ggrdc.lon[:]
-    latc = ggrdc.lat[:]
-
-    xc = cosd.(lonc) .* cosd.(latc)
-    yc = sind.(lonc) .* cosd.(latc)
-    zc = sind.(latc)
+    xc,yc,zc = coarsegrid(ggrdc)
 
     lonf = ggrdf.lon
     latf = ggrdf.lat
@@ -112,12 +97,7 @@ function nearest(
     ggrdc :: RegionGrid
 )
 
-    lonc = ggrdc.lon[:]
-    latc = ggrdc.lat[:]
-
-    xc = cosd.(lonc) .* cosd.(latc)
-    yc = sind.(lonc) .* cosd.(latc)
-    zc = sind.(latc)
+    xc,yc,zc = coarsegrid(ggrdc)
 
     lonf = ggrdf.lon
     latf = ggrdf.lat
@@ -134,3 +114,38 @@ function nearest(
     return imat
 
 end
+
+function coarsegrid(
+    ggrd :: RectilinearGrid
+)
+
+    lon = ggrd.lon; nlon = length(lon)
+    lat = ggrd.lat; nlat = length(lat)
+
+    xc = zeros(nlon,nlat)
+    yc = zeros(nlon,nlat)
+    zc = zeros(nlon,nlat)
+
+    for ilat = 1 : nlat, ilon = 1 : nlon
+        xc[ilon,ilat] = cosd.(lon[ilon]) * cosd.(lat[ilat])
+        yc[ilon,ilat] = sind.(lon[ilon]) * cosd.(lat[ilat])
+        zc[ilon,ilat] = sind.(lat[ilat])
+    end
+
+    return xc[:], yc[:], zc[:]
+
+end 
+
+function coarsegrid(
+    ggrd :: Union{GeneralizedGrid,UnstructuredGrid}
+)
+    lon = ggrd.lon[:]
+    lat = ggrd.lat[:]
+
+    xc = cosd.(lon) .* cosd.(lat)
+    yc = sind.(lon) .* cosd.(lat)
+    zc = sind.(lat)
+
+    return xc, yc, zc
+
+end 
