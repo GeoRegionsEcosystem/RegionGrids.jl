@@ -22,14 +22,16 @@ function nearest(
     gx,gy,gz = coarsegrid(ggrd)
 
     plon,plat = pnt[1],pnt[2]
-    px = cosd.(plon) * cosd.(plat)
-    py = sind.(plon) * cosd.(plat)
-    pz = sind.(plat)
+    px = cosd(plon) * cosd(plat)
+    py = sind(plon) * cosd(plat)
+    pz = sind(plat)
+
+    d2 = (gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2
 
     if isone(n)
-        return argmin((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2)
+        return argmin(d2)
     else
-        return sortperm((gx.-px).^2 .+ (gy.-py).^2 .+ (gz.-pz).^2)[1:n]
+        return sortperm(d2[:])[1:n]
     end
 
 end
@@ -124,6 +126,30 @@ function nearest(
 
 end
 
+function distances(
+    pnt  :: Point2,
+    ggrd :: RegionGrid;
+    n    :: Int = 0,
+    r    :: Real = 6370e3
+)
+
+    gx,gy,gz = coarsegrid(ggrd)
+
+    plon,plat = pnt[1],pnt[2]
+    px = cosd(plon) * cosd(plat)
+    py = sind(plon) * cosd(plat)
+    pz = sind(plat)
+
+    d2 = r * acos.((px*gx.+py*gy.+pz*gz)./(sqrt(px^2+py^2+pz^2)*sqrt.(gx.^2 .+ gy.^2 .+ gz.^2))) .* ggrd.mask
+
+    if iszero(n)
+        return d2
+    else
+        return sort(d2[:])[1:n]
+    end
+
+end
+
 function coarsegrid(
     ggrd :: RectilinearGrid
 )
@@ -141,20 +167,20 @@ function coarsegrid(
         zc[ilon,ilat] = sind(lat[ilat])
     end
 
-    return xc[:], yc[:], zc[:]
+    return xc,yc,zc
 
 end 
 
 function coarsegrid(
     ggrd :: Union{GeneralizedGrid,UnstructuredGrid}
 )
-    lon = ggrd.lon[:]
-    lat = ggrd.lat[:]
+    lon = ggrd.lon
+    lat = ggrd.lat
 
     xc = cosd.(lon) .* cosd.(lat)
     yc = sind.(lon) .* cosd.(lat)
     zc = sind.(lat)
 
-    return xc, yc, zc
+    return xc,yc,zc
 
 end 

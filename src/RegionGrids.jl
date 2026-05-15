@@ -11,7 +11,7 @@ import Base: show
 export
         RegionGrid, RectilinearGrid, GeneralizedGrid, UnstructuredGrid,
 
-        extract, extract!, nearest
+        extract, extract!, nearest, distances
 
 ## Abstract types
 """
