@@ -130,7 +130,7 @@ function distances(
     pnt  :: Point2,
     ggrd :: RegionGrid;
     n    :: Int = 0,
-    r    :: Real = 6370e3
+    r    :: Real = 6371e3
 )
 
     gx,gy,gz = coarsegrid(ggrd)
